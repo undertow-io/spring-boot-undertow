@@ -68,16 +68,24 @@ mvn clean install
 
 ## Tests
 
-This project uses the Spring Boot Web Server TCK (`spring-boot-web-server` test-fixtures) to validate compatibility. To run the tests:
+This project uses the Spring Boot Web Server TCK (`spring-boot-web-server` test-fixtures) to validate compatibility. The test-fixtures are not published to Maven Central, so you need to build Spring Boot locally first:
 
 ```bash
-mvn test -pl module/spring-boot-undertow
+# 1. Clone and build Spring Boot to install test-fixtures to your local Maven repo
+git clone https://github.com/spring-projects/spring-boot.git
+cd spring-boot
+git checkout v4.0.6
+./gradlew publishToMavenLocal
+
+# 2. Run the TCK tests with the 'tck' profile
+cd /path/to/spring-boot-undertow
+mvn test -pl module/spring-boot-undertow -Ptck
 ```
 
 **Test results:** 222 tests, 214 pass, 6 skipped, 8 known incompatibilities:
 
 - **5 log-message pattern tests** (inherited from TCK): The abstract base class uses a `(Jetty|Tomcat)` regex that cannot be modified. Equivalent Undertow-specific log-message tests are provided as `undertowStartedLogMessage*`.
-- **3 reactive graceful-shutdown tests** (inherited from TCK): Graceful shutdown in the reactive path requires native Undertow HTTP handler support, which is not available when using the Servlet bridge pattern. Servlet-based graceful shutdown works correctly.
+- **3 reactive stop/graceful-shutdown tests** (inherited from TCK): `Undertow.stop()` tears down the XNIO worker immediately. The old native `UndertowHttpHandlerAdapter` (removed from Spring Framework 7.0) kept worker threads busy for the request duration; the Servlet bridge dispatches to the servlet engine's async executor instead. Servlet-based graceful shutdown works correctly.
 
 ## Requirements
 
