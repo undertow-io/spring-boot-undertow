@@ -97,6 +97,7 @@ public class UndertowWebServerFactoryCustomizer
 		map.from(this.undertowProperties::getMaxHttpPostSize)
 			.as((size) -> {
 				long bytes = size.toBytes();
+				// 0 means unbounded in Undertow, -1 is our "unlimited" sentinel
 				return (bytes < 0) ? 0L : bytes;
 			})
 			.to(serverOptions.option(UndertowOptions.MAX_ENTITY_SIZE));
