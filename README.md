@@ -1,26 +1,23 @@
 # spring-boot-undertow
 
-> ⚠️ **This is a temporary bridge project.** It will be deprecated once the official Spring Boot 4 upstream adds native support for the Undertow starter.
+Community-maintained Undertow starter for Spring Boot 4.x.
 
 ## Background
 
-As of Spring Boot 4.1.0-M1, the upstream project does not yet publish an Undertow starter as a Maven artifact. This project fills that gap by providing:
+Undertow support was [removed from Spring Boot 4.0](https://github.com/spring-projects/spring-boot/issues/46917) because no Servlet 6.1-compatible Undertow release existed at the time. The Spring Boot team has [explicitly declined](https://github.com/spring-projects/spring-boot/issues/50381) re-adding it upstream, recommending a community-maintained third-party starter instead.
 
-- **`spring-boot-undertow`** — the core Undertow integration module for Spring Boot 4
-- **`spring-boot-starter-undertow`** — a ready-to-use starter that wires Undertow as the embedded servlet container
-
-Once the official Spring Boot 4 release includes Undertow starter support, this project should be replaced with the official dependency.
+This project fills that gap using [Undertow EE](https://github.com/undertow-io/undertow-ee) 2.0.0.Final (which implements Jakarta Servlet 6.1) and the modularised Undertow support from Spring Boot 4.0.0-M1 as a starting point.
 
 ## Project Structure
 
 ```
 spring-boot-undertow/
-├── pom.xml                                       ← parent POM
+├── pom.xml                                       <- parent POM
 ├── module/
-│   └── spring-boot-undertow/                     ← core Undertow integration
+│   └── spring-boot-undertow/                     <- core Undertow integration
 │       └── pom.xml
 └── starter/
-    └── spring-boot-starter-undertow/             ← Undertow starter
+    └── spring-boot-starter-undertow/             <- Undertow starter
         └── pom.xml
 ```
 
@@ -32,7 +29,7 @@ Add the starter to your Spring Boot 4 project:
 <dependency>
     <groupId>com.redhat.integration</groupId>
     <artifactId>spring-boot-starter-undertow</artifactId>
-    <version>4.19.0-SNAPSHOT</version>
+    <version>${undertow-starter.version}</version>
 </dependency>
 ```
 
@@ -51,25 +48,43 @@ Make sure to exclude the default Tomcat starter if you are using `spring-boot-st
 </dependency>
 ```
 
+### WebFlux (Reactive) Support
+
+This starter also works with `spring-boot-starter-webflux`. Reactive HTTP handling goes through the Servlet bridge (`ServletHttpHandlerAdapter`), the same approach Spring Boot uses for Jetty reactive support.
+
+### Micrometer Metrics
+
+When `spring-boot-starter-actuator` and `micrometer-core` are on the classpath, Undertow-specific metrics are automatically registered:
+
+- `undertow.threads.worker.*` - XNIO worker thread pool metrics (core, max, current, busy, queue size)
+- `undertow.threads.io` - IO thread count
+- `undertow.sessions.*` - Session metrics (active, created, expired)
+
 ## Building
 
 ```bash
-# Build and install to local Maven repository (skipping tests — see note below)
-mvn clean install -Dmaven.test.skip=true
+mvn clean install
 ```
 
-## ⚠️ Note on Tests
+## Tests
 
-Tests **cannot be compiled or executed** within this Maven project. This is because some base test infrastructure classes (e.g. abstract test base classes and test utilities) exist only inside the Spring Boot Gradle source tree and have **not been published as Maven artifacts**.
+This project uses the Spring Boot Web Server TCK (`spring-boot-web-server` test-fixtures) to validate compatibility. To run the tests:
 
-However, all tests in this project have been **manually verified against the Spring Boot Gradle project** and pass successfully. If you need to run the tests, clone the official Spring Boot repository and run them within its Gradle build environment.
+```bash
+mvn test -pl module/spring-boot-undertow
+```
+
+**Test results:** 222 tests, 214 pass, 6 skipped, 8 known incompatibilities:
+
+- **5 log-message pattern tests** (inherited from TCK): The abstract base class uses a `(Jetty|Tomcat)` regex that cannot be modified. Equivalent Undertow-specific log-message tests are provided as `undertowStartedLogMessage*`.
+- **3 reactive graceful-shutdown tests** (inherited from TCK): Graceful shutdown in the reactive path requires native Undertow HTTP handler support, which is not available when using the Servlet bridge pattern. Servlet-based graceful shutdown works correctly.
 
 ## Requirements
 
 - Java 17+
 - Maven 3.6+
-- Spring Boot 4.1.0-M1
+- Spring Boot 4.0.5+
 
 ## License
 
-This project follows the [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0), consistent with the upstream Spring Boot project.
+[Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0)
