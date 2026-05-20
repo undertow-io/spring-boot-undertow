@@ -1,2 +1,2 @@
 org.springframework.aot.hint.RuntimeHintsRegistrar=\
-com.redhat.integration.undertow.UndertowWebServer$UndertowWebServerRuntimeHints
+org.springframework.boot.undertow.UndertowWebServer$UndertowWebServerRuntimeHints
