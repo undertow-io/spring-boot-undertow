@@ -38,10 +38,10 @@ import org.springframework.util.unit.DataSize;
 public class UndertowServerProperties {
 
 	/**
-	 * Maximum size of the HTTP post content. When the value is -1, the default, the size
-	 * is unlimited.
+	 * Maximum size of the HTTP post content. Defaults to 2MB as a DoS protection
+	 * (CVE-2024-3884, CVE-2024-4027). Set to -1 for unlimited.
 	 */
-	private DataSize maxHttpPostSize = DataSize.ofBytes(-1);
+	private DataSize maxHttpPostSize = DataSize.ofBytes(2097152);
 
 	/**
 	 * Size of each buffer. The default is derived from the maximum amount of memory that
