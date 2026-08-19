@@ -4,12 +4,12 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.redhat.integration</groupId>
-  <artifactId>spring-boot-undertow-parent</artifactId>
-  <version>4.19.0-SNAPSHOT</version>
+  <groupId>io.undertow</groupId>
+  <artifactId>undertow-spring-boot-parent</artifactId>
+  <version>1.0.0.Final-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <name>spring-boot-undertow-parent</name>
+  <name>undertow-spring-boot-parent</name>
   <description>Parent POM for Spring Boot Undertow modules</description>
   <url>https://spring.io/projects/spring-boot</url>
 
@@ -21,11 +21,9 @@
     </license>
   </licenses>
 
-  <!-- Declare the two child modules in dependency order:
-       spring-boot-undertow must be built before spring-boot-starter-undertow -->
   <modules>
-    <module>module/spring-boot-undertow</module>
-    <module>starter/spring-boot-starter-undertow</module>
+    <module>module/undertow-spring-boot-autoconfigure</module>
+    <module>starter/undertow-spring-boot-starter</module>
   </modules>
 
   <properties>
