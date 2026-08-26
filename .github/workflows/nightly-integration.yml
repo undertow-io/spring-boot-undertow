@@ -33,7 +33,11 @@ jobs:
         id: boot-version
         shell: bash
         run: |
-          VERSION=$(./mvnw -B help:evaluate -Dexpression=spring-boot.version -DforceStdout -q)
+          # Property follows the version.<groupId> convention; fall back to the legacy name.
+          VERSION=$(./mvnw -B help:evaluate -Dexpression=version.org.springframework.boot -DforceStdout -q)
+          if [ -z "$VERSION" ] || [ "$VERSION" = "null object or invalid expression" ]; then
+            VERSION=$(./mvnw -B help:evaluate -Dexpression=spring-boot.version -DforceStdout -q)
+          fi
           echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
           echo "Spring Boot version: ${VERSION}"
 
