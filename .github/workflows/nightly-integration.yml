@@ -1,0 +1,80 @@
+# This workflow runs the Spring Boot Web Server TCK against this project.
+# The TCK depends on spring-boot-web-server test-fixtures which are not
+# published to Maven Central, so we clone Spring Boot and build them first.
+
+name: Nightly TCK
+
+on:
+  schedule:
+    - cron: '0 2 * * *' # Every day at 02:00 UTC
+  workflow_dispatch:
+
+# Only run the latest job
+concurrency:
+  group: '${{ github.workflow }} @ ${{ github.ref }}'
+  cancel-in-progress: true
+
+jobs:
+  tck:
+    name: TCK - JDK ${{ matrix.jdk }} - ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        jdk: [17, 21, 25]
+    steps:
+      - name: Checkout spring-boot-undertow
+        uses: actions/checkout@v6
+
+      - name: Set up JDK ${{ matrix.jdk }}
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: ${{ matrix.jdk }}
+
+      - name: Read Spring Boot version from POM
+        id: boot-version
+        shell: bash
+        run: |
+          VERSION=$(mvn -B help:evaluate -Dexpression=spring-boot.version -DforceStdout -q)
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "Spring Boot version: ${VERSION}"
+
+      - name: Checkout Spring Boot
+        uses: actions/checkout@v6
+        with:
+          repository: spring-projects/spring-boot
+          ref: v${{ steps.boot-version.outputs.version }}
+          path: spring-boot
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: true
+
+      - name: Build Spring Boot test fixtures
+        working-directory: spring-boot
+        shell: bash
+        run: ./gradlew :spring-boot-project:spring-boot-web-server:publishToMavenLocal :spring-boot-project:spring-boot-test-support:publishToMavenLocal
+
+      - name: Cache Maven repository
+        uses: actions/cache@v5
+        with:
+          path: ~/.m2/repository
+          key: m2-tck-${{ hashFiles('**/pom.xml') }}-${{ matrix.jdk }}
+          restore-keys: |
+            m2-tck-${{ hashFiles('**/pom.xml') }}-
+            m2-tck-
+
+      - name: Run TCK
+        run: mvn -B verify -Ptck -pl module/undertow-spring-boot-autoconfigure
+
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: surefire-reports-tck-${{ matrix.jdk }}-${{ matrix.os }}
+          path: |
+            **/surefire*-reports/*.txt
+            **/*.dump*
