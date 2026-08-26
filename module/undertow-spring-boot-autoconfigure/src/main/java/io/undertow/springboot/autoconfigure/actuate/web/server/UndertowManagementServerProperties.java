@@ -23,7 +23,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  *
  * @since 4.0.0
  */
-@ConfigurationProperties("management.server.undertow")
+@ConfigurationProperties("undertow.management")
 public class UndertowManagementServerProperties {
 
 	private final Accesslog accesslog = new Accesslog();

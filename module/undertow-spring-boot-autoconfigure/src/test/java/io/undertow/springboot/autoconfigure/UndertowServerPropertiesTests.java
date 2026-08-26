@@ -39,25 +39,25 @@ class UndertowServerPropertiesTests {
 
 	@Test
 	void testCustomizeUndertowServerOption() {
-		bind("server.undertow.options.server.ALWAYS_SET_KEEP_ALIVE", "true");
+		bind("undertow.server.options.server.ALWAYS_SET_KEEP_ALIVE", "true");
 		assertThat(this.properties.getOptions().getServer()).containsEntry("ALWAYS_SET_KEEP_ALIVE", "true");
 	}
 
 	@Test
 	void testCustomizeUndertowSocketOption() {
-		bind("server.undertow.options.socket.ALWAYS_SET_KEEP_ALIVE", "true");
+		bind("undertow.server.options.socket.ALWAYS_SET_KEEP_ALIVE", "true");
 		assertThat(this.properties.getOptions().getSocket()).containsEntry("ALWAYS_SET_KEEP_ALIVE", "true");
 	}
 
 	@Test
 	void testCustomizeUndertowIoThreads() {
-		bind("server.undertow.threads.io", "4");
+		bind("undertow.server.threads.io", "4");
 		assertThat(this.properties.getThreads().getIo()).isEqualTo(4);
 	}
 
 	@Test
 	void testCustomizeUndertowWorkerThreads() {
-		bind("server.undertow.threads.worker", "10");
+		bind("undertow.server.threads.worker", "10");
 		assertThat(this.properties.getThreads().getWorker()).isEqualTo(10);
 	}
 
@@ -72,7 +72,7 @@ class UndertowServerPropertiesTests {
 
 	private void bind(Map<String, String> map) {
 		ConfigurationPropertySource source = new MapConfigurationPropertySource(map);
-		new Binder(source).bind("server.undertow", Bindable.ofInstance(this.properties));
+		new Binder(source).bind("undertow.server", Bindable.ofInstance(this.properties));
 	}
 
 }
