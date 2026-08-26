@@ -42,60 +42,60 @@ import org.springframework.core.env.PropertySource;
  */
 public class LegacyUndertowPropertyReport implements ApplicationListener<ApplicationReadyEvent> {
 
-	private static final Log logger = LogFactory.getLog(LegacyUndertowPropertyReport.class);
+    private static final Log logger = LogFactory.getLog(LegacyUndertowPropertyReport.class);
 
-	@Override
-	public void onApplicationEvent(ApplicationReadyEvent event) {
-		ConfigurableEnvironment env = event.getApplicationContext().getEnvironment();
-		LegacyUndertowPropertyMapper.ReportPropertySource report = getReportSource(env);
-		if (report == null) {
-			return;
-		}
+    @Override
+    public void onApplicationEvent(ApplicationReadyEvent event) {
+        ConfigurableEnvironment env = event.getApplicationContext().getEnvironment();
+        LegacyUndertowPropertyMapper.ReportPropertySource report = getReportSource(env);
+        if (report == null) {
+            return;
+        }
 
-		List<LegacyUndertowPropertyMapper.MappedKey> mapped = report.getMappedKeys();
-		List<LegacyUndertowPropertyMapper.ShadowedKey> shadowed = report.getShadowedKeys();
+        List<LegacyUndertowPropertyMapper.MappedKey> mapped = report.getMappedKeys();
+        List<LegacyUndertowPropertyMapper.ShadowedKey> shadowed = report.getShadowedKeys();
 
-		if (mapped.isEmpty() && shadowed.isEmpty()) {
-			return;
-		}
+        if (mapped.isEmpty() && shadowed.isEmpty()) {
+            return;
+        }
 
-		StringBuilder message = new StringBuilder();
-		if (!mapped.isEmpty()) {
-			message.append("The following Undertow properties use deprecated prefixes ")
-					.append("and will be removed in a future release. Please migrate:\n");
-			for (LegacyUndertowPropertyMapper.MappedKey key : mapped) {
-				message.append("  ").append(key.oldKey()).append(" -> ").append(key.newKey()).append('\n');
-			}
-		}
-		if (!shadowed.isEmpty()) {
-			message.append("The following deprecated Undertow properties were ignored ")
-					.append("because the new key is also set:\n");
-			for (LegacyUndertowPropertyMapper.ShadowedKey key : shadowed) {
-				message.append("  ").append(key.oldKey())
-						.append(" (ignored, using ").append(key.newKey()).append(")\n");
-			}
-		}
+        StringBuilder message = new StringBuilder();
+        if (!mapped.isEmpty()) {
+            message.append("The following Undertow properties use deprecated prefixes ")
+                    .append("and will be removed in a future release. Please migrate:\n");
+            for (LegacyUndertowPropertyMapper.MappedKey key : mapped) {
+                message.append("  ").append(key.oldKey()).append(" -> ").append(key.newKey()).append('\n');
+            }
+        }
+        if (!shadowed.isEmpty()) {
+            message.append("The following deprecated Undertow properties were ignored ")
+                    .append("because the new key is also set:\n");
+            for (LegacyUndertowPropertyMapper.ShadowedKey key : shadowed) {
+                message.append("  ").append(key.oldKey())
+                        .append(" (ignored, using ").append(key.newKey()).append(")\n");
+            }
+        }
 
-		logger.warn(message.toString().stripTrailing());
-	}
+        logger.warn(message.toString().stripTrailing());
+    }
 
-	static LegacyUndertowPropertyMapper.ReportPropertySource getReportSource(ConfigurableEnvironment env) {
-		PropertySource<?> source = env.getPropertySources()
-				.get(LegacyUndertowPropertyMapper.REPORT_SOURCE_NAME);
-		if (source instanceof LegacyUndertowPropertyMapper.ReportPropertySource reportSource) {
-			return reportSource;
-		}
-		return null;
-	}
+    static LegacyUndertowPropertyMapper.ReportPropertySource getReportSource(ConfigurableEnvironment env) {
+        PropertySource<?> source = env.getPropertySources()
+                .get(LegacyUndertowPropertyMapper.REPORT_SOURCE_NAME);
+        if (source instanceof LegacyUndertowPropertyMapper.ReportPropertySource reportSource) {
+            return reportSource;
+        }
+        return null;
+    }
 
-	static List<LegacyUndertowPropertyMapper.MappedKey> getMappedKeys(ConfigurableEnvironment env) {
-		LegacyUndertowPropertyMapper.ReportPropertySource report = getReportSource(env);
-		return (report != null) ? report.getMappedKeys() : Collections.emptyList();
-	}
+    static List<LegacyUndertowPropertyMapper.MappedKey> getMappedKeys(ConfigurableEnvironment env) {
+        LegacyUndertowPropertyMapper.ReportPropertySource report = getReportSource(env);
+        return (report != null) ? report.getMappedKeys() : Collections.emptyList();
+    }
 
-	static List<LegacyUndertowPropertyMapper.ShadowedKey> getShadowedKeys(ConfigurableEnvironment env) {
-		LegacyUndertowPropertyMapper.ReportPropertySource report = getReportSource(env);
-		return (report != null) ? report.getShadowedKeys() : Collections.emptyList();
-	}
+    static List<LegacyUndertowPropertyMapper.ShadowedKey> getShadowedKeys(ConfigurableEnvironment env) {
+        LegacyUndertowPropertyMapper.ReportPropertySource report = getReportSource(env);
+        return (report != null) ? report.getShadowedKeys() : Collections.emptyList();
+    }
 
 }
