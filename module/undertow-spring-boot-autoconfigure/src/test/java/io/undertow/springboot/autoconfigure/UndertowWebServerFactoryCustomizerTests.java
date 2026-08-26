@@ -68,9 +68,9 @@ class UndertowWebServerFactoryCustomizerTests {
 
 	@Test
 	void customizeUndertowAccessLog() {
-		bind("server.undertow.accesslog.enabled=true", "server.undertow.accesslog.pattern=foo",
-				"server.undertow.accesslog.prefix=test_log", "server.undertow.accesslog.suffix=txt",
-				"server.undertow.accesslog.dir=test-logs", "server.undertow.accesslog.rotate=false");
+		bind("undertow.server.accesslog.enabled=true", "undertow.server.accesslog.pattern=foo",
+				"undertow.server.accesslog.prefix=test_log", "undertow.server.accesslog.suffix=txt",
+				"undertow.server.accesslog.dir=test-logs", "undertow.server.accesslog.rotate=false");
 		ConfigurableUndertowWebServerFactory factory = mock(ConfigurableUndertowWebServerFactory.class);
 		this.customizer.customize(factory);
 		then(factory).should().setAccessLogEnabled(true);
@@ -101,37 +101,37 @@ class UndertowWebServerFactoryCustomizerTests {
 
 	@Test
 	void customMaxHttpPostSize() {
-		bind("server.undertow.max-http-post-size=256");
+		bind("undertow.server.max-http-post-size=256");
 		assertThat(boundServerOption(UndertowOptions.MAX_ENTITY_SIZE)).isEqualTo(256);
 	}
 
 	@Test
 	void customConnectionTimeout() {
-		bind("server.undertow.no-request-timeout=1m");
+		bind("undertow.server.no-request-timeout=1m");
 		assertThat(boundServerOption(UndertowOptions.NO_REQUEST_TIMEOUT)).isEqualTo(60000);
 	}
 
 	@Test
 	void customMaxParameters() {
-		bind("server.undertow.max-parameters=4");
+		bind("undertow.server.max-parameters=4");
 		assertThat(boundServerOption(UndertowOptions.MAX_PARAMETERS)).isEqualTo(4);
 	}
 
 	@Test
 	void customMaxHeaders() {
-		bind("server.undertow.max-headers=4");
+		bind("undertow.server.max-headers=4");
 		assertThat(boundServerOption(UndertowOptions.MAX_HEADERS)).isEqualTo(4);
 	}
 
 	@Test
 	void customMaxCookies() {
-		bind("server.undertow.max-cookies=4");
+		bind("undertow.server.max-cookies=4");
 		assertThat(boundServerOption(UndertowOptions.MAX_COOKIES)).isEqualTo(4);
 	}
 
 	@Test
 	void customizeIoThreads() {
-		bind("server.undertow.threads.io=4");
+		bind("undertow.server.threads.io=4");
 		ConfigurableUndertowWebServerFactory factory = mock(ConfigurableUndertowWebServerFactory.class);
 		this.customizer.customize(factory);
 		then(factory).should().setIoThreads(4);
@@ -139,7 +139,7 @@ class UndertowWebServerFactoryCustomizerTests {
 
 	@Test
 	void customizeWorkerThreads() {
-		bind("server.undertow.threads.worker=10");
+		bind("undertow.server.threads.worker=10");
 		ConfigurableUndertowWebServerFactory factory = mock(ConfigurableUndertowWebServerFactory.class);
 		this.customizer.customize(factory);
 		then(factory).should().setWorkerThreads(10);
@@ -147,49 +147,49 @@ class UndertowWebServerFactoryCustomizerTests {
 
 	@Test
 	void enableSlashDecoding() {
-		bind("server.undertow.decode-slash=true");
+		bind("undertow.server.decode-slash=true");
 		assertThat(boundServerOption(UndertowOptions.DECODE_SLASH)).isTrue();
 	}
 
 	@Test
 	void disableUrlDecoding() {
-		bind("server.undertow.decode-url=false");
+		bind("undertow.server.decode-url=false");
 		assertThat(boundServerOption(UndertowOptions.DECODE_URL)).isFalse();
 	}
 
 	@Test
 	void customUrlCharset() {
-		bind("server.undertow.url-charset=UTF-16");
+		bind("undertow.server.url-charset=UTF-16");
 		assertThat(boundServerOption(UndertowOptions.URL_CHARSET)).isEqualTo(StandardCharsets.UTF_16.name());
 	}
 
 	@Test
 	void disableAlwaysSetKeepAlive() {
-		bind("server.undertow.always-set-keep-alive=false");
+		bind("undertow.server.always-set-keep-alive=false");
 		assertThat(boundServerOption(UndertowOptions.ALWAYS_SET_KEEP_ALIVE)).isFalse();
 	}
 
 	@Test
 	void customServerOption() {
-		bind("server.undertow.options.server.ALWAYS_SET_KEEP_ALIVE=false");
+		bind("undertow.server.options.server.ALWAYS_SET_KEEP_ALIVE=false");
 		assertThat(boundServerOption(UndertowOptions.ALWAYS_SET_KEEP_ALIVE)).isFalse();
 	}
 
 	@Test
 	void customServerOptionShouldBeRelaxed() {
-		bind("server.undertow.options.server.always-set-keep-alive=false");
+		bind("undertow.server.options.server.always-set-keep-alive=false");
 		assertThat(boundServerOption(UndertowOptions.ALWAYS_SET_KEEP_ALIVE)).isFalse();
 	}
 
 	@Test
 	void customSocketOption() {
-		bind("server.undertow.options.socket.CONNECTION_LOW_WATER=8");
+		bind("undertow.server.options.socket.CONNECTION_LOW_WATER=8");
 		assertThat(boundSocketOption(Options.CONNECTION_LOW_WATER)).isEqualTo(8);
 	}
 
 	@Test
 	void customSocketOptionShouldBeRelaxed() {
-		bind("server.undertow.options.socket.connection-low-water=8");
+		bind("undertow.server.options.socket.connection-low-water=8");
 		assertThat(boundSocketOption(Options.CONNECTION_LOW_WATER)).isEqualTo(8);
 	}
 
@@ -257,7 +257,7 @@ class UndertowWebServerFactoryCustomizerTests {
 		TestPropertySourceUtils.addInlinedPropertiesToEnvironment(this.environment, inlinedProperties);
 		Binder binder = new Binder(ConfigurationPropertySources.get(this.environment));
 		binder.bind("server", Bindable.ofInstance(this.serverProperties));
-		binder.bind("server.undertow", Bindable.ofInstance(this.undertowProperties));
+		binder.bind("undertow.server", Bindable.ofInstance(this.undertowProperties));
 	}
 
 }

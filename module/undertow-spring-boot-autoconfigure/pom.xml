@@ -23,6 +23,11 @@
   </properties>
   <dependencies>
     <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-configuration-processor</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
       <groupId>io.undertow.ee</groupId>
       <artifactId>undertow-servlet</artifactId>
       <scope>compile</scope>
@@ -71,6 +76,11 @@
       <groupId>jakarta.servlet</groupId>
       <artifactId>jakarta.servlet-api</artifactId>
       <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
@@ -157,14 +167,38 @@
           <artifactId>maven-compiler-plugin</artifactId>
           <configuration>
             <release>${maven.compiler.release}</release>
-            <skip>true</skip>
+            <skip>false</skip>
+            <proc>full</proc>
+            <annotationProcessorPaths>
+              <path>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-configuration-processor</artifactId>
+                <version>${spring-boot.version}</version>
+              </path>
+            </annotationProcessorPaths>
+            <testExcludes>
+              <testExclude>**/servlet/UndertowServletWebServerFactoryTests.java</testExclude>
+              <testExclude>**/reactive/UndertowReactiveWebServerFactoryTests.java</testExclude>
+              <testExclude>**/servlet/UndertowServletWebServerAutoConfigurationTests.java</testExclude>
+              <testExclude>**/reactive/UndertowReactiveWebServerAutoConfigurationTests.java</testExclude>
+              <testExclude>**/servlet/UndertowServletWebServerServletContextListenerTests.java</testExclude>
+              <testExclude>**/servlet/UndertowServletWebServerMvcIntegrationTests.java</testExclude>
+            </testExcludes>
           </configuration>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
           <configuration>
-            <skipTests>true</skipTests>
+            <skipTests>false</skipTests>
+            <excludes>
+              <exclude>**/servlet/UndertowServletWebServerFactoryTests.java</exclude>
+              <exclude>**/reactive/UndertowReactiveWebServerFactoryTests.java</exclude>
+              <exclude>**/servlet/UndertowServletWebServerAutoConfigurationTests.java</exclude>
+              <exclude>**/reactive/UndertowReactiveWebServerAutoConfigurationTests.java</exclude>
+              <exclude>**/servlet/UndertowServletWebServerServletContextListenerTests.java</exclude>
+              <exclude>**/servlet/UndertowServletWebServerMvcIntegrationTests.java</exclude>
+            </excludes>
           </configuration>
         </plugin>
       </plugins>
@@ -222,6 +256,7 @@
             <artifactId>maven-compiler-plugin</artifactId>
             <configuration>
               <skip>false</skip>
+              <testExcludes combine.self="override" />
             </configuration>
           </plugin>
           <plugin>
@@ -229,6 +264,7 @@
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
               <skipTests>false</skipTests>
+              <excludes combine.self="override" />
               <argLine>--add-opens java.base/java.net=ALL-UNNAMED</argLine>
             </configuration>
           </plugin>

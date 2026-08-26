@@ -34,7 +34,7 @@ import org.springframework.util.unit.DataSize;
  *
  * @since 4.0.0
  */
-@ConfigurationProperties("server.undertow")
+@ConfigurationProperties("undertow.server")
 public class UndertowServerProperties {
 
 	/**
