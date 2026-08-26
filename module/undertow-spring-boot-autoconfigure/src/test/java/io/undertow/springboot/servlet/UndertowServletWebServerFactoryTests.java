@@ -76,347 +76,347 @@ import static org.mockito.Mockito.mock;
  */
 class UndertowServletWebServerFactoryTests extends AbstractServletWebServerFactoryTests {
 
-	@Override
-	protected UndertowServletWebServerFactory getFactory() {
-		return new UndertowServletWebServerFactory(0);
-	}
+    @Override
+    protected UndertowServletWebServerFactory getFactory() {
+        return new UndertowServletWebServerFactory(0);
+    }
 
-	@AfterEach
-	void awaitClosureOfSslRelatedInputStreams() {
-		// https://issues.redhat.com/browse/UNDERTOW-1705
-		File resource = new File(this.tempDir, "test.txt");
-		Awaitility.await().atMost(Duration.ofSeconds(30)).until(() -> (!resource.isFile()) || resource.delete());
-	}
+    @AfterEach
+    void awaitClosureOfSslRelatedInputStreams() {
+        // https://issues.redhat.com/browse/UNDERTOW-1705
+        File resource = new File(this.tempDir, "test.txt");
+        Awaitility.await().atMost(Duration.ofSeconds(30)).until(() -> (!resource.isFile()) || resource.delete());
+    }
 
-	@Test
-	void errorPage404() throws Exception {
-		ConfigurableServletWebServerFactory factory = getFactory();
-		factory.addErrorPages(new ErrorPage(HttpStatus.NOT_FOUND, "/hello"));
-		this.webServer = factory.getWebServer(new ServletRegistrationBean<>(new ExampleServlet(), "/hello"));
-		this.webServer.start();
-		assertThat(getResponse(getLocalUrl("/hello"))).isEqualTo("Hello World");
-		assertThat(getResponse(getLocalUrl("/not-found"))).isEqualTo("Hello World");
-	}
+    @Test
+    void errorPage404() throws Exception {
+        ConfigurableServletWebServerFactory factory = getFactory();
+        factory.addErrorPages(new ErrorPage(HttpStatus.NOT_FOUND, "/hello"));
+        this.webServer = factory.getWebServer(new ServletRegistrationBean<>(new ExampleServlet(), "/hello"));
+        this.webServer.start();
+        assertThat(getResponse(getLocalUrl("/hello"))).isEqualTo("Hello World");
+        assertThat(getResponse(getLocalUrl("/not-found"))).isEqualTo("Hello World");
+    }
 
-	@Test
-	void setNullBuilderCustomizersThrows() {
-		UndertowServletWebServerFactory factory = getFactory();
-		assertThatIllegalArgumentException().isThrownBy(() -> factory.setBuilderCustomizers(null))
-			.withMessageContaining("'customizers' must not be null");
-	}
+    @Test
+    void setNullBuilderCustomizersThrows() {
+        UndertowServletWebServerFactory factory = getFactory();
+        assertThatIllegalArgumentException().isThrownBy(() -> factory.setBuilderCustomizers(null))
+            .withMessageContaining("'customizers' must not be null");
+    }
 
-	@Test
-	void addNullAddBuilderCustomizersThrows() {
-		UndertowServletWebServerFactory factory = getFactory();
-		assertThatIllegalArgumentException()
-			.isThrownBy(() -> factory.addBuilderCustomizers((UndertowBuilderCustomizer[]) null))
-			.withMessageContaining("'customizers' must not be null");
-	}
+    @Test
+    void addNullAddBuilderCustomizersThrows() {
+        UndertowServletWebServerFactory factory = getFactory();
+        assertThatIllegalArgumentException()
+            .isThrownBy(() -> factory.addBuilderCustomizers((UndertowBuilderCustomizer[]) null))
+            .withMessageContaining("'customizers' must not be null");
+    }
 
-	@Test
-	void builderCustomizers() {
-		UndertowServletWebServerFactory factory = getFactory();
-		UndertowBuilderCustomizer[] customizers = new UndertowBuilderCustomizer[4];
-		Arrays.setAll(customizers, (i) -> mock(UndertowBuilderCustomizer.class));
-		factory.setBuilderCustomizers(Arrays.asList(customizers[0], customizers[1]));
-		factory.addBuilderCustomizers(customizers[2], customizers[3]);
-		this.webServer = factory.getWebServer();
-		InOrder ordered = inOrder((Object[]) customizers);
-		for (UndertowBuilderCustomizer customizer : customizers) {
-			ordered.verify(customizer).customize(any(Builder.class));
-		}
-	}
+    @Test
+    void builderCustomizers() {
+        UndertowServletWebServerFactory factory = getFactory();
+        UndertowBuilderCustomizer[] customizers = new UndertowBuilderCustomizer[4];
+        Arrays.setAll(customizers, (i) -> mock(UndertowBuilderCustomizer.class));
+        factory.setBuilderCustomizers(Arrays.asList(customizers[0], customizers[1]));
+        factory.addBuilderCustomizers(customizers[2], customizers[3]);
+        this.webServer = factory.getWebServer();
+        InOrder ordered = inOrder((Object[]) customizers);
+        for (UndertowBuilderCustomizer customizer : customizers) {
+            ordered.verify(customizer).customize(any(Builder.class));
+        }
+    }
 
-	@Test
-	void setNullDeploymentInfoCustomizersThrows() {
-		UndertowServletWebServerFactory factory = getFactory();
-		assertThatIllegalArgumentException().isThrownBy(() -> factory.setDeploymentInfoCustomizers(null))
-			.withMessageContaining("'customizers' must not be null");
-	}
+    @Test
+    void setNullDeploymentInfoCustomizersThrows() {
+        UndertowServletWebServerFactory factory = getFactory();
+        assertThatIllegalArgumentException().isThrownBy(() -> factory.setDeploymentInfoCustomizers(null))
+            .withMessageContaining("'customizers' must not be null");
+    }
 
-	@Test
-	void addNullAddDeploymentInfoCustomizersThrows() {
-		UndertowServletWebServerFactory factory = getFactory();
-		assertThatIllegalArgumentException()
-			.isThrownBy(() -> factory.addDeploymentInfoCustomizers((UndertowDeploymentInfoCustomizer[]) null))
-			.withMessageContaining("'customizers' must not be null");
-	}
+    @Test
+    void addNullAddDeploymentInfoCustomizersThrows() {
+        UndertowServletWebServerFactory factory = getFactory();
+        assertThatIllegalArgumentException()
+            .isThrownBy(() -> factory.addDeploymentInfoCustomizers((UndertowDeploymentInfoCustomizer[]) null))
+            .withMessageContaining("'customizers' must not be null");
+    }
 
-	@Test
-	void deploymentInfo() {
-		UndertowServletWebServerFactory factory = getFactory();
-		UndertowDeploymentInfoCustomizer[] customizers = new UndertowDeploymentInfoCustomizer[4];
-		Arrays.setAll(customizers, (i) -> mock(UndertowDeploymentInfoCustomizer.class));
-		factory.setDeploymentInfoCustomizers(Arrays.asList(customizers[0], customizers[1]));
-		factory.addDeploymentInfoCustomizers(customizers[2], customizers[3]);
-		this.webServer = factory.getWebServer();
-		InOrder ordered = inOrder((Object[]) customizers);
-		for (UndertowDeploymentInfoCustomizer customizer : customizers) {
-			ordered.verify(customizer).customize(any(DeploymentInfo.class));
-		}
-	}
+    @Test
+    void deploymentInfo() {
+        UndertowServletWebServerFactory factory = getFactory();
+        UndertowDeploymentInfoCustomizer[] customizers = new UndertowDeploymentInfoCustomizer[4];
+        Arrays.setAll(customizers, (i) -> mock(UndertowDeploymentInfoCustomizer.class));
+        factory.setDeploymentInfoCustomizers(Arrays.asList(customizers[0], customizers[1]));
+        factory.addDeploymentInfoCustomizers(customizers[2], customizers[3]);
+        this.webServer = factory.getWebServer();
+        InOrder ordered = inOrder((Object[]) customizers);
+        for (UndertowDeploymentInfoCustomizer customizer : customizers) {
+            ordered.verify(customizer).customize(any(DeploymentInfo.class));
+        }
+    }
 
-	@Test
-	@WithPackageResources("test.jks")
-	void basicSslClasspathKeyStore() throws Exception {
-		testBasicSslWithKeyStore("classpath:test.jks");
-	}
+    @Test
+    @WithPackageResources("test.jks")
+    void basicSslClasspathKeyStore() throws Exception {
+        testBasicSslWithKeyStore("classpath:test.jks");
+    }
 
-	@Test
-	void defaultContextPath() {
-		UndertowServletWebServerFactory factory = getFactory();
-		final AtomicReference<String> contextPath = new AtomicReference<>();
-		factory.addDeploymentInfoCustomizers((deploymentInfo) -> contextPath.set(deploymentInfo.getContextPath()));
-		this.webServer = factory.getWebServer();
-		assertThat(contextPath.get()).isEqualTo("/");
-	}
+    @Test
+    void defaultContextPath() {
+        UndertowServletWebServerFactory factory = getFactory();
+        final AtomicReference<String> contextPath = new AtomicReference<>();
+        factory.addDeploymentInfoCustomizers((deploymentInfo) -> contextPath.set(deploymentInfo.getContextPath()));
+        this.webServer = factory.getWebServer();
+        assertThat(contextPath.get()).isEqualTo("/");
+    }
 
-	@Test
-	void useForwardHeaders() throws Exception {
-		UndertowServletWebServerFactory factory = getFactory();
-		factory.setUseForwardHeaders(true);
-		assertForwardHeaderIsUsed(factory);
-	}
+    @Test
+    void useForwardHeaders() throws Exception {
+        UndertowServletWebServerFactory factory = getFactory();
+        factory.setUseForwardHeaders(true);
+        assertForwardHeaderIsUsed(factory);
+    }
 
-	@Test
-	void eachFactoryUsesADiscreteServletContainer() {
-		assertThat(getServletContainerFromNewFactory()).isNotEqualTo(getServletContainerFromNewFactory());
-	}
+    @Test
+    void eachFactoryUsesADiscreteServletContainer() {
+        assertThat(getServletContainerFromNewFactory()).isNotEqualTo(getServletContainerFromNewFactory());
+    }
 
-	@Test
-	void accessLogCanBeEnabled() throws IOException, URISyntaxException {
-		testAccessLog(null, null, "access_log.log");
-	}
+    @Test
+    void accessLogCanBeEnabled() throws IOException, URISyntaxException {
+        testAccessLog(null, null, "access_log.log");
+    }
 
-	@Test
-	void accessLogCanBeCustomized() throws IOException, URISyntaxException {
-		testAccessLog("my_access.", "logz", "my_access.logz");
-	}
+    @Test
+    void accessLogCanBeCustomized() throws IOException, URISyntaxException {
+        testAccessLog("my_access.", "logz", "my_access.logz");
+    }
 
-	@Test
-	void whenServerIsShuttingDownGracefullyThenRequestsAreRejectedWithServiceUnavailable() throws Exception {
-		ConfigurableServletWebServerFactory factory = getFactory();
-		factory.setShutdown(Shutdown.GRACEFUL);
-		BlockingServlet blockingServlet = new BlockingServlet();
-		this.webServer = factory.getWebServer((context) -> {
-			Dynamic registration = context.addServlet("blockingServlet", blockingServlet);
-			registration.addMapping("/blocking");
-			registration.setAsyncSupported(true);
-		});
-		this.webServer.start();
-		int port = this.webServer.getPort();
-		Future<Object> request = initiateGetRequest(port, "/blocking");
-		blockingServlet.awaitQueue();
-		AtomicReference<GracefulShutdownResult> result = new AtomicReference<>();
-		this.webServer.shutDownGracefully(result::set);
-		assertThat(result.get()).isNull();
-		blockingServlet.admitOne();
-		assertThat(request.get()).isInstanceOf(HttpResponse.class);
-		Object rejectedResult = initiateGetRequest(port, "/").get();
-		assertThat(rejectedResult).isInstanceOf(HttpResponse.class);
-		assertThat(((HttpResponse) rejectedResult).getCode()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE.value());
-		this.webServer.stop();
-	}
+    @Test
+    void whenServerIsShuttingDownGracefullyThenRequestsAreRejectedWithServiceUnavailable() throws Exception {
+        ConfigurableServletWebServerFactory factory = getFactory();
+        factory.setShutdown(Shutdown.GRACEFUL);
+        BlockingServlet blockingServlet = new BlockingServlet();
+        this.webServer = factory.getWebServer((context) -> {
+            Dynamic registration = context.addServlet("blockingServlet", blockingServlet);
+            registration.addMapping("/blocking");
+            registration.setAsyncSupported(true);
+        });
+        this.webServer.start();
+        int port = this.webServer.getPort();
+        Future<Object> request = initiateGetRequest(port, "/blocking");
+        blockingServlet.awaitQueue();
+        AtomicReference<GracefulShutdownResult> result = new AtomicReference<>();
+        this.webServer.shutDownGracefully(result::set);
+        assertThat(result.get()).isNull();
+        blockingServlet.admitOne();
+        assertThat(request.get()).isInstanceOf(HttpResponse.class);
+        Object rejectedResult = initiateGetRequest(port, "/").get();
+        assertThat(rejectedResult).isInstanceOf(HttpResponse.class);
+        assertThat(((HttpResponse) rejectedResult).getCode()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE.value());
+        this.webServer.stop();
+    }
 
-	@Test
-	void whenServerIsShuttingDownARequestOnAnIdleConnectionAreRejectedWithServiceUnavailable() throws Exception {
-		ConfigurableServletWebServerFactory factory = getFactory();
-		factory.setShutdown(Shutdown.GRACEFUL);
-		BlockingServlet blockingServlet = new BlockingServlet();
-		this.webServer = factory.getWebServer((context) -> {
-			Dynamic registration = context.addServlet("blockingServlet", blockingServlet);
-			registration.addMapping("/blocking");
-			registration.setAsyncSupported(true);
-		});
-		HttpClient httpClient = HttpClients.createMinimal();
-		this.webServer.start();
-		int port = this.webServer.getPort();
-		Future<Object> keepAliveRequest = initiateGetRequest(httpClient, port, "/blocking");
-		blockingServlet.awaitQueue();
-		blockingServlet.admitOne();
-		assertThat(keepAliveRequest.get()).isInstanceOf(HttpResponse.class);
-		Future<Object> request = initiateGetRequest(port, "/blocking");
-		blockingServlet.awaitQueue();
-		this.webServer.shutDownGracefully((result) -> {
-		});
-		HttpResponse idleConnectionResponse = (HttpResponse) initiateGetRequest(httpClient, port, "/").get();
-		assertThat(idleConnectionResponse.getCode()).isEqualTo(503);
-		blockingServlet.admitOne();
-		Object response = request.get();
-		assertThat(response).isInstanceOf(HttpResponse.class);
-		this.webServer.stop();
-	}
+    @Test
+    void whenServerIsShuttingDownARequestOnAnIdleConnectionAreRejectedWithServiceUnavailable() throws Exception {
+        ConfigurableServletWebServerFactory factory = getFactory();
+        factory.setShutdown(Shutdown.GRACEFUL);
+        BlockingServlet blockingServlet = new BlockingServlet();
+        this.webServer = factory.getWebServer((context) -> {
+            Dynamic registration = context.addServlet("blockingServlet", blockingServlet);
+            registration.addMapping("/blocking");
+            registration.setAsyncSupported(true);
+        });
+        HttpClient httpClient = HttpClients.createMinimal();
+        this.webServer.start();
+        int port = this.webServer.getPort();
+        Future<Object> keepAliveRequest = initiateGetRequest(httpClient, port, "/blocking");
+        blockingServlet.awaitQueue();
+        blockingServlet.admitOne();
+        assertThat(keepAliveRequest.get()).isInstanceOf(HttpResponse.class);
+        Future<Object> request = initiateGetRequest(port, "/blocking");
+        blockingServlet.awaitQueue();
+        this.webServer.shutDownGracefully((result) -> {
+        });
+        HttpResponse idleConnectionResponse = (HttpResponse) initiateGetRequest(httpClient, port, "/").get();
+        assertThat(idleConnectionResponse.getCode()).isEqualTo(503);
+        blockingServlet.admitOne();
+        Object response = request.get();
+        assertThat(response).isInstanceOf(HttpResponse.class);
+        this.webServer.stop();
+    }
 
-	@Test
-	@Override
-	@Disabled("https://issues.redhat.com/browse/UNDERTOW-2420")
-	protected void portClashOfSecondaryConnectorResultsInPortInUseException() throws Exception {
-		super.portClashOfSecondaryConnectorResultsInPortInUseException();
-	}
+    @Test
+    @Override
+    @Disabled("https://issues.redhat.com/browse/UNDERTOW-2420")
+    protected void portClashOfSecondaryConnectorResultsInPortInUseException() throws Exception {
+        super.portClashOfSecondaryConnectorResultsInPortInUseException();
+    }
 
-	@Test
-	@Override
-	@Disabled("Restart after stop is not supported with Undertow")
-	protected void restartAfterStop() {
-	}
+    @Test
+    @Override
+    @Disabled("Restart after stop is not supported with Undertow")
+    protected void restartAfterStop() {
+    }
 
-	@Test
-	@Override
-	@Disabled("Undertow's architecture prevents separating stop and destroy")
-	protected void servletContextListenerContextDestroyedIsNotCalledWhenContainerIsStopped() {
-	}
+    @Test
+    @Override
+    @Disabled("Undertow's architecture prevents separating stop and destroy")
+    protected void servletContextListenerContextDestroyedIsNotCalledWhenContainerIsStopped() {
+    }
 
-	private void testAccessLog(String prefix, String suffix, String expectedFile)
-			throws IOException, URISyntaxException {
-		UndertowServletWebServerFactory factory = getFactory();
-		factory.setAccessLogEnabled(true);
-		factory.setAccessLogPrefix(prefix);
-		factory.setAccessLogSuffix(suffix);
-		File accessLogDirectory = this.tempDir;
-		factory.setAccessLogDirectory(accessLogDirectory);
-		assertThat(accessLogDirectory).isEmptyDirectory();
-		this.webServer = factory.getWebServer(new ServletRegistrationBean<>(new ExampleServlet(), "/hello"));
-		this.webServer.start();
-		assertThat(getResponse(getLocalUrl("/hello"))).isEqualTo("Hello World");
-		File accessLog = new File(accessLogDirectory, expectedFile);
-		awaitFile(accessLog);
-		assertThat(accessLogDirectory.listFiles()).contains(accessLog);
-	}
+    private void testAccessLog(String prefix, String suffix, String expectedFile)
+            throws IOException, URISyntaxException {
+        UndertowServletWebServerFactory factory = getFactory();
+        factory.setAccessLogEnabled(true);
+        factory.setAccessLogPrefix(prefix);
+        factory.setAccessLogSuffix(suffix);
+        File accessLogDirectory = this.tempDir;
+        factory.setAccessLogDirectory(accessLogDirectory);
+        assertThat(accessLogDirectory).isEmptyDirectory();
+        this.webServer = factory.getWebServer(new ServletRegistrationBean<>(new ExampleServlet(), "/hello"));
+        this.webServer.start();
+        assertThat(getResponse(getLocalUrl("/hello"))).isEqualTo("Hello World");
+        File accessLog = new File(accessLogDirectory, expectedFile);
+        awaitFile(accessLog);
+        assertThat(accessLogDirectory.listFiles()).contains(accessLog);
+    }
 
-	@Override
-	protected void addConnector(int port, ConfigurableServletWebServerFactory factory) {
-		((UndertowServletWebServerFactory) factory)
-			.addBuilderCustomizers((builder) -> builder.addHttpListener(port, "0.0.0.0"));
-	}
+    @Override
+    protected void addConnector(int port, ConfigurableServletWebServerFactory factory) {
+        ((UndertowServletWebServerFactory) factory)
+            .addBuilderCustomizers((builder) -> builder.addHttpListener(port, "0.0.0.0"));
+    }
 
-	@Test
-	@WithPackageResources("restricted.jks")
-	void sslRestrictedProtocolsEmptyCipherFailure() {
-		assertThatIOException()
-			.isThrownBy(() -> testRestrictedSSLProtocolsAndCipherSuites(new String[] { "TLSv1.2" },
-					new String[] { "TLS_EMPTY_RENEGOTIATION_INFO_SCSV" }))
-			.isInstanceOfAny(SSLException.class, SSLHandshakeException.class, SocketException.class);
-	}
+    @Test
+    @WithPackageResources("restricted.jks")
+    void sslRestrictedProtocolsEmptyCipherFailure() {
+        assertThatIOException()
+            .isThrownBy(() -> testRestrictedSSLProtocolsAndCipherSuites(new String[] { "TLSv1.2" },
+                    new String[] { "TLS_EMPTY_RENEGOTIATION_INFO_SCSV" }))
+            .isInstanceOfAny(SSLException.class, SSLHandshakeException.class, SocketException.class);
+    }
 
-	@Test
-	@WithPackageResources("restricted.jks")
-	void sslRestrictedProtocolsECDHETLS1Failure() {
-		assertThatIOException()
-			.isThrownBy(() -> testRestrictedSSLProtocolsAndCipherSuites(new String[] { "TLSv1" },
-					new String[] { "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256" }))
-			.isInstanceOfAny(SSLException.class, SocketException.class);
-	}
+    @Test
+    @WithPackageResources("restricted.jks")
+    void sslRestrictedProtocolsECDHETLS1Failure() {
+        assertThatIOException()
+            .isThrownBy(() -> testRestrictedSSLProtocolsAndCipherSuites(new String[] { "TLSv1" },
+                    new String[] { "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256" }))
+            .isInstanceOfAny(SSLException.class, SocketException.class);
+    }
 
-	@Test
-	@WithPackageResources("restricted.jks")
-	void sslRestrictedProtocolsECDHESuccess() throws Exception {
-		testRestrictedSSLProtocolsAndCipherSuites(new String[] { "TLSv1.2" },
-				new String[] { "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256" });
-	}
+    @Test
+    @WithPackageResources("restricted.jks")
+    void sslRestrictedProtocolsECDHESuccess() throws Exception {
+        testRestrictedSSLProtocolsAndCipherSuites(new String[] { "TLSv1.2" },
+                new String[] { "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256" });
+    }
 
-	@Test
-	@WithPackageResources("restricted.jks")
-	@DisabledForJreRange(min = JRE.JAVA_24)
-	void sslRestrictedProtocolsRSATLS12Success() throws Exception {
-		testRestrictedSSLProtocolsAndCipherSuites(new String[] { "TLSv1.2" },
-				new String[] { "TLS_RSA_WITH_AES_128_CBC_SHA256" });
-	}
+    @Test
+    @WithPackageResources("restricted.jks")
+    @DisabledForJreRange(min = JRE.JAVA_24)
+    void sslRestrictedProtocolsRSATLS12Success() throws Exception {
+        testRestrictedSSLProtocolsAndCipherSuites(new String[] { "TLSv1.2" },
+                new String[] { "TLS_RSA_WITH_AES_128_CBC_SHA256" });
+    }
 
-	@Test
-	@WithPackageResources("restricted.jks")
-	void sslRestrictedProtocolsRSATLS11Failure() {
-		assertThatIOException()
-			.isThrownBy(() -> testRestrictedSSLProtocolsAndCipherSuites(new String[] { "TLSv1.1" },
-					new String[] { "TLS_RSA_WITH_AES_128_CBC_SHA256" }))
-			.isInstanceOfAny(SSLException.class, SocketException.class);
-	}
+    @Test
+    @WithPackageResources("restricted.jks")
+    void sslRestrictedProtocolsRSATLS11Failure() {
+        assertThatIOException()
+            .isThrownBy(() -> testRestrictedSSLProtocolsAndCipherSuites(new String[] { "TLSv1.1" },
+                    new String[] { "TLS_RSA_WITH_AES_128_CBC_SHA256" }))
+            .isInstanceOfAny(SSLException.class, SocketException.class);
+    }
 
-	@Override
-	protected JspServlet getJspServlet() {
-		return null; // Undertow does not support JSPs
-	}
+    @Override
+    protected JspServlet getJspServlet() {
+        return null; // Undertow does not support JSPs
+    }
 
-	private void awaitFile(File file) {
-		Awaitility.waitAtMost(Duration.ofSeconds(10)).until(file::exists, is(true));
-	}
+    private void awaitFile(File file) {
+        Awaitility.waitAtMost(Duration.ofSeconds(10)).until(file::exists, is(true));
+    }
 
-	private ServletContainer getServletContainerFromNewFactory() {
-		UndertowServletWebServer container = (UndertowServletWebServer) getFactory().getWebServer();
-		try {
-			return container.getDeploymentManager().getDeployment().getServletContainer();
-		}
-		finally {
-			container.stop();
-		}
-	}
+    private ServletContainer getServletContainerFromNewFactory() {
+        UndertowServletWebServer container = (UndertowServletWebServer) getFactory().getWebServer();
+        try {
+            return container.getDeploymentManager().getDeployment().getServletContainer();
+        }
+        finally {
+            container.stop();
+        }
+    }
 
-	@Override
-	protected Map<String, String> getActualMimeMappings() {
-		return ((UndertowServletWebServer) this.webServer).getDeploymentManager()
-			.getDeployment()
-			.getMimeExtensionMappings();
-	}
+    @Override
+    protected Map<String, String> getActualMimeMappings() {
+        return ((UndertowServletWebServer) this.webServer).getDeploymentManager()
+            .getDeployment()
+            .getMimeExtensionMappings();
+    }
 
-	@Override
-	protected Charset getCharset(Locale locale) {
-		DeploymentInfo info = ((UndertowServletWebServer) this.webServer).getDeploymentManager()
-			.getDeployment()
-			.getDeploymentInfo();
-		String charsetName = info.getLocaleCharsetMapping().get(locale.toString());
-		return (charsetName != null) ? Charset.forName(charsetName) : null;
-	}
+    @Override
+    protected Charset getCharset(Locale locale) {
+        DeploymentInfo info = ((UndertowServletWebServer) this.webServer).getDeploymentManager()
+            .getDeployment()
+            .getDeploymentInfo();
+        String charsetName = info.getLocaleCharsetMapping().get(locale.toString());
+        return (charsetName != null) ? Charset.forName(charsetName) : null;
+    }
 
-	@Override
-	protected void handleExceptionCausedByBlockedPortOnPrimaryConnector(RuntimeException ex, int blockedPort) {
-		assertThat(ex).isInstanceOf(PortInUseException.class);
-		assertThat(((PortInUseException) ex).getPort()).isEqualTo(blockedPort);
-		Undertow undertow = (Undertow) ReflectionTestUtils.getField(this.webServer, "undertow");
-		assertThat(undertow.getWorker()).isNull();
-	}
+    @Override
+    protected void handleExceptionCausedByBlockedPortOnPrimaryConnector(RuntimeException ex, int blockedPort) {
+        assertThat(ex).isInstanceOf(PortInUseException.class);
+        assertThat(((PortInUseException) ex).getPort()).isEqualTo(blockedPort);
+        Undertow undertow = (Undertow) ReflectionTestUtils.getField(this.webServer, "undertow");
+        assertThat(undertow.getWorker()).isNull();
+    }
 
-	@Override
-	protected void handleExceptionCausedByBlockedPortOnSecondaryConnector(RuntimeException ex, int blockedPort) {
-		handleExceptionCausedByBlockedPortOnPrimaryConnector(ex, blockedPort);
-	}
+    @Override
+    protected void handleExceptionCausedByBlockedPortOnSecondaryConnector(RuntimeException ex, int blockedPort) {
+        handleExceptionCausedByBlockedPortOnPrimaryConnector(ex, blockedPort);
+    }
 
-	@Override
-	protected String startedLogMessage() {
-		return ((UndertowServletWebServer) this.webServer).getStartedLogMessage();
-	}
+    @Override
+    protected String startedLogMessage() {
+        return ((UndertowServletWebServer) this.webServer).getStartedLogMessage();
+    }
 
-	@Test
-	void undertowStartedLogMessageWithSinglePort() {
-		this.webServer = getFactory().getWebServer();
-		this.webServer.start();
-		assertThat(startedLogMessage()).matches("Undertow started on port \\d+ \\(http\\) with context path '/'");
-	}
+    @Test
+    void undertowStartedLogMessageWithSinglePort() {
+        this.webServer = getFactory().getWebServer();
+        this.webServer.start();
+        assertThat(startedLogMessage()).matches("Undertow started on port \\d+ \\(http\\) with context path '/'");
+    }
 
-	@Test
-	void undertowStartedLogMessageWithSinglePortAndContextPath() {
-		UndertowServletWebServerFactory factory = getFactory();
-		factory.setContextPath("/test");
-		this.webServer = factory.getWebServer();
-		this.webServer.start();
-		assertThat(startedLogMessage()).matches("Undertow started on port \\d+ \\(http\\) with context path '/test'");
-	}
+    @Test
+    void undertowStartedLogMessageWithSinglePortAndContextPath() {
+        UndertowServletWebServerFactory factory = getFactory();
+        factory.setContextPath("/test");
+        this.webServer = factory.getWebServer();
+        this.webServer.start();
+        assertThat(startedLogMessage()).matches("Undertow started on port \\d+ \\(http\\) with context path '/test'");
+    }
 
-	@Test
-	void undertowStartedLogMessageWithMultiplePorts() {
-		UndertowServletWebServerFactory factory = getFactory();
-		factory.addBuilderCustomizers((builder) -> builder.addHttpListener(0, "0.0.0.0"));
-		this.webServer = factory.getWebServer();
-		this.webServer.start();
-		assertThat(startedLogMessage()).matches("Undertow started on ports \\d+ \\(http\\), \\d+ \\(http\\) with context path '/'");
-	}
+    @Test
+    void undertowStartedLogMessageWithMultiplePorts() {
+        UndertowServletWebServerFactory factory = getFactory();
+        factory.addBuilderCustomizers((builder) -> builder.addHttpListener(0, "0.0.0.0"));
+        this.webServer = factory.getWebServer();
+        this.webServer.start();
+        assertThat(startedLogMessage()).matches("Undertow started on ports \\d+ \\(http\\), \\d+ \\(http\\) with context path '/'");
+    }
 
-	private void testRestrictedSSLProtocolsAndCipherSuites(String[] protocols, String[] ciphers) throws Exception {
-		ConfigurableServletWebServerFactory factory = getFactory();
-		factory.setSsl(getSsl(null, "password", "classpath:restricted.jks", null, protocols, ciphers));
-		this.webServer = factory.getWebServer(new ServletRegistrationBean<>(new ExampleServlet(true, false), "/hello"));
-		this.webServer.start();
-		HttpComponentsClientHttpRequestFactory requestFactory = createHttpComponentsRequestFactory(
-				createTrustSelfSignedTlsSocketStrategy());
-		assertThat(getResponse(getLocalUrl("https", "/hello"), requestFactory)).contains("scheme=https");
-	}
+    private void testRestrictedSSLProtocolsAndCipherSuites(String[] protocols, String[] ciphers) throws Exception {
+        ConfigurableServletWebServerFactory factory = getFactory();
+        factory.setSsl(getSsl(null, "password", "classpath:restricted.jks", null, protocols, ciphers));
+        this.webServer = factory.getWebServer(new ServletRegistrationBean<>(new ExampleServlet(true, false), "/hello"));
+        this.webServer.start();
+        HttpComponentsClientHttpRequestFactory requestFactory = createHttpComponentsRequestFactory(
+                createTrustSelfSignedTlsSocketStrategy());
+        assertThat(getResponse(getLocalUrl("https", "/hello"), requestFactory)).contains("scheme=https");
+    }
 
 }

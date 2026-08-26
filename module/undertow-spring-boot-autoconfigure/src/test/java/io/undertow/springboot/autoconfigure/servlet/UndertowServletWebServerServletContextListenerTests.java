@@ -29,18 +29,18 @@ import org.springframework.context.annotation.Configuration;
  */
 class UndertowServletWebServerServletContextListenerTests extends AbstractServletWebServerServletContextListenerTests {
 
-	UndertowServletWebServerServletContextListenerTests() {
-		super(UndertowConfiguration.class);
-	}
+    UndertowServletWebServerServletContextListenerTests() {
+        super(UndertowConfiguration.class);
+    }
 
-	@Configuration(proxyBeanMethods = false)
-	static class UndertowConfiguration {
+    @Configuration(proxyBeanMethods = false)
+    static class UndertowConfiguration {
 
-		@Bean
-		UndertowServletWebServerFactory webServerFactory() {
-			return new UndertowServletWebServerFactory(0);
-		}
+        @Bean
+        UndertowServletWebServerFactory webServerFactory() {
+            return new UndertowServletWebServerFactory(0);
+        }
 
-	}
+    }
 
 }

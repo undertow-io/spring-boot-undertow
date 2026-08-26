@@ -30,17 +30,17 @@ import io.undertow.springboot.ConfigurableUndertowWebServerFactory;
  */
 class UndertowAccessLogCustomizer<T extends ConfigurableUndertowWebServerFactory> extends AccessLogCustomizer<T> {
 
-	private final Function<T, @Nullable String> accessLogPrefixExtractor;
+    private final Function<T, @Nullable String> accessLogPrefixExtractor;
 
-	UndertowAccessLogCustomizer(UndertowManagementServerProperties properties,
-			Function<T, @Nullable String> accessLogPrefixExtractor) {
-		super(properties.getAccesslog().getPrefix());
-		this.accessLogPrefixExtractor = accessLogPrefixExtractor;
-	}
+    UndertowAccessLogCustomizer(UndertowManagementServerProperties properties,
+            Function<T, @Nullable String> accessLogPrefixExtractor) {
+        super(properties.getAccesslog().getPrefix());
+        this.accessLogPrefixExtractor = accessLogPrefixExtractor;
+    }
 
-	@Override
-	public void customize(T factory) {
-		factory.setAccessLogPrefix(customizePrefix(this.accessLogPrefixExtractor.apply(factory)));
-	}
+    @Override
+    public void customize(T factory) {
+        factory.setAccessLogPrefix(customizePrefix(this.accessLogPrefixExtractor.apply(factory)));
+    }
 
 }

@@ -36,46 +36,46 @@ import org.springframework.util.StringUtils;
  */
 class JarResourceManager implements ResourceManager {
 
-	private final String jarPath;
+    private final String jarPath;
 
-	JarResourceManager(File jarFile) {
-		try {
-			this.jarPath = jarFile.getAbsoluteFile().toURI().toURL().toString();
-		}
-		catch (MalformedURLException ex) {
-			throw new IllegalArgumentException(ex);
-		}
-	}
+    JarResourceManager(File jarFile) {
+        try {
+            this.jarPath = jarFile.getAbsoluteFile().toURI().toURL().toString();
+        }
+        catch (MalformedURLException ex) {
+            throw new IllegalArgumentException(ex);
+        }
+    }
 
-	@Override
-	public @Nullable Resource getResource(String path) throws IOException {
-		URL url = new URL("jar:" + this.jarPath + "!" + (path.startsWith("/") ? path : "/" + path));
-		URLResource resource = new URLResource(url, path);
-		if (StringUtils.hasText(path) && !"/".equals(path) && resource.getContentLength() < 0) {
-			return null;
-		}
-		return resource;
-	}
+    @Override
+    public @Nullable Resource getResource(String path) throws IOException {
+        URL url = new URL("jar:" + this.jarPath + "!" + (path.startsWith("/") ? path : "/" + path));
+        URLResource resource = new URLResource(url, path);
+        if (StringUtils.hasText(path) && !"/".equals(path) && resource.getContentLength() < 0) {
+            return null;
+        }
+        return resource;
+    }
 
-	@Override
-	public boolean isResourceChangeListenerSupported() {
-		return false;
-	}
+    @Override
+    public boolean isResourceChangeListenerSupported() {
+        return false;
+    }
 
-	@Override
-	public void registerResourceChangeListener(ResourceChangeListener listener) {
-		throw UndertowMessages.MESSAGES.resourceChangeListenerNotSupported();
+    @Override
+    public void registerResourceChangeListener(ResourceChangeListener listener) {
+        throw UndertowMessages.MESSAGES.resourceChangeListenerNotSupported();
 
-	}
+    }
 
-	@Override
-	public void removeResourceChangeListener(ResourceChangeListener listener) {
-		throw UndertowMessages.MESSAGES.resourceChangeListenerNotSupported();
-	}
+    @Override
+    public void removeResourceChangeListener(ResourceChangeListener listener) {
+        throw UndertowMessages.MESSAGES.resourceChangeListenerNotSupported();
+    }
 
-	@Override
-	public void close() throws IOException {
+    @Override
+    public void close() throws IOException {
 
-	}
+    }
 
 }

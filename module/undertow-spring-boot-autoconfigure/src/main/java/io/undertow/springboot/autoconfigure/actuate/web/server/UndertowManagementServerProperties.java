@@ -26,27 +26,27 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties("management.server.undertow")
 public class UndertowManagementServerProperties {
 
-	private final Accesslog accesslog = new Accesslog();
+    private final Accesslog accesslog = new Accesslog();
 
-	public Accesslog getAccesslog() {
-		return this.accesslog;
-	}
+    public Accesslog getAccesslog() {
+        return this.accesslog;
+    }
 
-	public static class Accesslog {
+    public static class Accesslog {
 
-		/**
-		 * Management log file name prefix.
-		 */
-		private String prefix = "management_";
+        /**
+         * Management log file name prefix.
+         */
+        private String prefix = "management_";
 
-		public String getPrefix() {
-			return this.prefix;
-		}
+        public String getPrefix() {
+            return this.prefix;
+        }
 
-		public void setPrefix(String prefix) {
-			this.prefix = prefix;
-		}
+        public void setPrefix(String prefix) {
+            this.prefix = prefix;
+        }
 
-	}
+    }
 
 }

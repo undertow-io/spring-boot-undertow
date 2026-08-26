@@ -39,52 +39,52 @@ import org.springframework.boot.web.server.Ssl.ClientAuth;
  */
 class SslBuilderCustomizer implements UndertowBuilderCustomizer {
 
-	private final int port;
+    private final int port;
 
-	private final @Nullable InetAddress address;
+    private final @Nullable InetAddress address;
 
-	private final @Nullable ClientAuth clientAuth;
+    private final @Nullable ClientAuth clientAuth;
 
-	private final SslBundle sslBundle;
+    private final SslBundle sslBundle;
 
-	private final Map<String, SslBundle> serverNameSslBundles;
+    private final Map<String, SslBundle> serverNameSslBundles;
 
-	SslBuilderCustomizer(int port, @Nullable InetAddress address, @Nullable ClientAuth clientAuth, SslBundle sslBundle,
-			Map<String, SslBundle> serverNameSslBundles) {
-		this.port = port;
-		this.address = address;
-		this.clientAuth = clientAuth;
-		this.sslBundle = sslBundle;
-		this.serverNameSslBundles = serverNameSslBundles;
-	}
+    SslBuilderCustomizer(int port, @Nullable InetAddress address, @Nullable ClientAuth clientAuth, SslBundle sslBundle,
+            Map<String, SslBundle> serverNameSslBundles) {
+        this.port = port;
+        this.address = address;
+        this.clientAuth = clientAuth;
+        this.sslBundle = sslBundle;
+        this.serverNameSslBundles = serverNameSslBundles;
+    }
 
-	@Override
-	public void customize(Undertow.Builder builder) {
-		SslOptions options = this.sslBundle.getOptions();
-		builder.addHttpsListener(this.port, getListenAddress(), createSslContext());
-		builder.setSocketOption(Options.SSL_CLIENT_AUTH_MODE, ClientAuth.map(this.clientAuth,
-				SslClientAuthMode.NOT_REQUESTED, SslClientAuthMode.REQUESTED, SslClientAuthMode.REQUIRED));
-		if (options.getEnabledProtocols() != null) {
-			builder.setSocketOption(Options.SSL_ENABLED_PROTOCOLS, Sequence.of(options.getEnabledProtocols()));
-		}
-		if (options.getCiphers() != null) {
-			builder.setSocketOption(Options.SSL_ENABLED_CIPHER_SUITES, Sequence.of(options.getCiphers()));
-		}
-	}
+    @Override
+    public void customize(Undertow.Builder builder) {
+        SslOptions options = this.sslBundle.getOptions();
+        builder.addHttpsListener(this.port, getListenAddress(), createSslContext());
+        builder.setSocketOption(Options.SSL_CLIENT_AUTH_MODE, ClientAuth.map(this.clientAuth,
+                SslClientAuthMode.NOT_REQUESTED, SslClientAuthMode.REQUESTED, SslClientAuthMode.REQUIRED));
+        if (options.getEnabledProtocols() != null) {
+            builder.setSocketOption(Options.SSL_ENABLED_PROTOCOLS, Sequence.of(options.getEnabledProtocols()));
+        }
+        if (options.getCiphers() != null) {
+            builder.setSocketOption(Options.SSL_ENABLED_CIPHER_SUITES, Sequence.of(options.getCiphers()));
+        }
+    }
 
-	private SSLContext createSslContext() {
-		SNIContextMatcher.Builder builder = new SNIContextMatcher.Builder();
-		builder.setDefaultContext(this.sslBundle.createSslContext());
-		this.serverNameSslBundles
-			.forEach((serverName, sslBundle) -> builder.addMatch(serverName, sslBundle.createSslContext()));
-		return new SNISSLContext(builder.build());
-	}
+    private SSLContext createSslContext() {
+        SNIContextMatcher.Builder builder = new SNIContextMatcher.Builder();
+        builder.setDefaultContext(this.sslBundle.createSslContext());
+        this.serverNameSslBundles
+            .forEach((serverName, sslBundle) -> builder.addMatch(serverName, sslBundle.createSslContext()));
+        return new SNISSLContext(builder.build());
+    }
 
-	private String getListenAddress() {
-		if (this.address == null) {
-			return "0.0.0.0";
-		}
-		return this.address.getHostAddress();
-	}
+    private String getListenAddress() {
+        if (this.address == null) {
+            return "0.0.0.0";
+        }
+        return this.address.getHostAddress();
+    }
 
 }

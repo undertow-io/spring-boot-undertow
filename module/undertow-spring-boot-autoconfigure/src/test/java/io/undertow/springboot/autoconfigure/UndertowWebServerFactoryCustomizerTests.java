@@ -51,213 +51,213 @@ import static org.mockito.Mockito.mock;
  */
 class UndertowWebServerFactoryCustomizerTests {
 
-	private final MockEnvironment environment = new MockEnvironment();
+    private final MockEnvironment environment = new MockEnvironment();
 
-	private final ServerProperties serverProperties = new ServerProperties();
+    private final ServerProperties serverProperties = new ServerProperties();
 
-	private final UndertowServerProperties undertowProperties = new UndertowServerProperties();
+    private final UndertowServerProperties undertowProperties = new UndertowServerProperties();
 
-	private UndertowWebServerFactoryCustomizer customizer;
+    private UndertowWebServerFactoryCustomizer customizer;
 
-	@BeforeEach
-	void setup() {
-		ConfigurationPropertySources.attach(this.environment);
-		this.customizer = new UndertowWebServerFactoryCustomizer(this.environment, this.serverProperties,
-				this.undertowProperties);
-	}
+    @BeforeEach
+    void setup() {
+        ConfigurationPropertySources.attach(this.environment);
+        this.customizer = new UndertowWebServerFactoryCustomizer(this.environment, this.serverProperties,
+                this.undertowProperties);
+    }
 
-	@Test
-	void customizeUndertowAccessLog() {
-		bind("server.undertow.accesslog.enabled=true", "server.undertow.accesslog.pattern=foo",
-				"server.undertow.accesslog.prefix=test_log", "server.undertow.accesslog.suffix=txt",
-				"server.undertow.accesslog.dir=test-logs", "server.undertow.accesslog.rotate=false");
-		ConfigurableUndertowWebServerFactory factory = mock(ConfigurableUndertowWebServerFactory.class);
-		this.customizer.customize(factory);
-		then(factory).should().setAccessLogEnabled(true);
-		then(factory).should().setAccessLogPattern("foo");
-		then(factory).should().setAccessLogPrefix("test_log");
-		then(factory).should().setAccessLogSuffix("txt");
-		then(factory).should().setAccessLogDirectory(new File("test-logs"));
-		then(factory).should().setAccessLogRotate(false);
-	}
+    @Test
+    void customizeUndertowAccessLog() {
+        bind("server.undertow.accesslog.enabled=true", "server.undertow.accesslog.pattern=foo",
+                "server.undertow.accesslog.prefix=test_log", "server.undertow.accesslog.suffix=txt",
+                "server.undertow.accesslog.dir=test-logs", "server.undertow.accesslog.rotate=false");
+        ConfigurableUndertowWebServerFactory factory = mock(ConfigurableUndertowWebServerFactory.class);
+        this.customizer.customize(factory);
+        then(factory).should().setAccessLogEnabled(true);
+        then(factory).should().setAccessLogPattern("foo");
+        then(factory).should().setAccessLogPrefix("test_log");
+        then(factory).should().setAccessLogSuffix("txt");
+        then(factory).should().setAccessLogDirectory(new File("test-logs"));
+        then(factory).should().setAccessLogRotate(false);
+    }
 
-	@Test
-	void customMaxHttpRequestHeaderSize() {
-		bind("server.max-http-request-header-size=2048");
-		assertThat(boundServerOption(UndertowOptions.MAX_HEADER_SIZE)).isEqualTo(2048);
-	}
+    @Test
+    void customMaxHttpRequestHeaderSize() {
+        bind("server.max-http-request-header-size=2048");
+        assertThat(boundServerOption(UndertowOptions.MAX_HEADER_SIZE)).isEqualTo(2048);
+    }
 
-	@Test
-	void customMaxHttpRequestHeaderSizeIgnoredIfNegative() {
-		bind("server.max-http-request-header-size=-1");
-		assertThat(boundServerOption(UndertowOptions.MAX_HEADER_SIZE)).isNull();
-	}
+    @Test
+    void customMaxHttpRequestHeaderSizeIgnoredIfNegative() {
+        bind("server.max-http-request-header-size=-1");
+        assertThat(boundServerOption(UndertowOptions.MAX_HEADER_SIZE)).isNull();
+    }
 
-	@Test
-	void customMaxHttpRequestHeaderSizeIgnoredIfZero() {
-		bind("server.max-http-request-header-size=0");
-		assertThat(boundServerOption(UndertowOptions.MAX_HEADER_SIZE)).isNull();
-	}
+    @Test
+    void customMaxHttpRequestHeaderSizeIgnoredIfZero() {
+        bind("server.max-http-request-header-size=0");
+        assertThat(boundServerOption(UndertowOptions.MAX_HEADER_SIZE)).isNull();
+    }
 
-	@Test
-	void customMaxHttpPostSize() {
-		bind("server.undertow.max-http-post-size=256");
-		assertThat(boundServerOption(UndertowOptions.MAX_ENTITY_SIZE)).isEqualTo(256);
-	}
+    @Test
+    void customMaxHttpPostSize() {
+        bind("server.undertow.max-http-post-size=256");
+        assertThat(boundServerOption(UndertowOptions.MAX_ENTITY_SIZE)).isEqualTo(256);
+    }
 
-	@Test
-	void customConnectionTimeout() {
-		bind("server.undertow.no-request-timeout=1m");
-		assertThat(boundServerOption(UndertowOptions.NO_REQUEST_TIMEOUT)).isEqualTo(60000);
-	}
+    @Test
+    void customConnectionTimeout() {
+        bind("server.undertow.no-request-timeout=1m");
+        assertThat(boundServerOption(UndertowOptions.NO_REQUEST_TIMEOUT)).isEqualTo(60000);
+    }
 
-	@Test
-	void customMaxParameters() {
-		bind("server.undertow.max-parameters=4");
-		assertThat(boundServerOption(UndertowOptions.MAX_PARAMETERS)).isEqualTo(4);
-	}
+    @Test
+    void customMaxParameters() {
+        bind("server.undertow.max-parameters=4");
+        assertThat(boundServerOption(UndertowOptions.MAX_PARAMETERS)).isEqualTo(4);
+    }
 
-	@Test
-	void customMaxHeaders() {
-		bind("server.undertow.max-headers=4");
-		assertThat(boundServerOption(UndertowOptions.MAX_HEADERS)).isEqualTo(4);
-	}
+    @Test
+    void customMaxHeaders() {
+        bind("server.undertow.max-headers=4");
+        assertThat(boundServerOption(UndertowOptions.MAX_HEADERS)).isEqualTo(4);
+    }
 
-	@Test
-	void customMaxCookies() {
-		bind("server.undertow.max-cookies=4");
-		assertThat(boundServerOption(UndertowOptions.MAX_COOKIES)).isEqualTo(4);
-	}
+    @Test
+    void customMaxCookies() {
+        bind("server.undertow.max-cookies=4");
+        assertThat(boundServerOption(UndertowOptions.MAX_COOKIES)).isEqualTo(4);
+    }
 
-	@Test
-	void customizeIoThreads() {
-		bind("server.undertow.threads.io=4");
-		ConfigurableUndertowWebServerFactory factory = mock(ConfigurableUndertowWebServerFactory.class);
-		this.customizer.customize(factory);
-		then(factory).should().setIoThreads(4);
-	}
+    @Test
+    void customizeIoThreads() {
+        bind("server.undertow.threads.io=4");
+        ConfigurableUndertowWebServerFactory factory = mock(ConfigurableUndertowWebServerFactory.class);
+        this.customizer.customize(factory);
+        then(factory).should().setIoThreads(4);
+    }
 
-	@Test
-	void customizeWorkerThreads() {
-		bind("server.undertow.threads.worker=10");
-		ConfigurableUndertowWebServerFactory factory = mock(ConfigurableUndertowWebServerFactory.class);
-		this.customizer.customize(factory);
-		then(factory).should().setWorkerThreads(10);
-	}
+    @Test
+    void customizeWorkerThreads() {
+        bind("server.undertow.threads.worker=10");
+        ConfigurableUndertowWebServerFactory factory = mock(ConfigurableUndertowWebServerFactory.class);
+        this.customizer.customize(factory);
+        then(factory).should().setWorkerThreads(10);
+    }
 
-	@Test
-	void enableSlashDecoding() {
-		bind("server.undertow.decode-slash=true");
-		assertThat(boundServerOption(UndertowOptions.DECODE_SLASH)).isTrue();
-	}
+    @Test
+    void enableSlashDecoding() {
+        bind("server.undertow.decode-slash=true");
+        assertThat(boundServerOption(UndertowOptions.DECODE_SLASH)).isTrue();
+    }
 
-	@Test
-	void disableUrlDecoding() {
-		bind("server.undertow.decode-url=false");
-		assertThat(boundServerOption(UndertowOptions.DECODE_URL)).isFalse();
-	}
+    @Test
+    void disableUrlDecoding() {
+        bind("server.undertow.decode-url=false");
+        assertThat(boundServerOption(UndertowOptions.DECODE_URL)).isFalse();
+    }
 
-	@Test
-	void customUrlCharset() {
-		bind("server.undertow.url-charset=UTF-16");
-		assertThat(boundServerOption(UndertowOptions.URL_CHARSET)).isEqualTo(StandardCharsets.UTF_16.name());
-	}
+    @Test
+    void customUrlCharset() {
+        bind("server.undertow.url-charset=UTF-16");
+        assertThat(boundServerOption(UndertowOptions.URL_CHARSET)).isEqualTo(StandardCharsets.UTF_16.name());
+    }
 
-	@Test
-	void disableAlwaysSetKeepAlive() {
-		bind("server.undertow.always-set-keep-alive=false");
-		assertThat(boundServerOption(UndertowOptions.ALWAYS_SET_KEEP_ALIVE)).isFalse();
-	}
+    @Test
+    void disableAlwaysSetKeepAlive() {
+        bind("server.undertow.always-set-keep-alive=false");
+        assertThat(boundServerOption(UndertowOptions.ALWAYS_SET_KEEP_ALIVE)).isFalse();
+    }
 
-	@Test
-	void customServerOption() {
-		bind("server.undertow.options.server.ALWAYS_SET_KEEP_ALIVE=false");
-		assertThat(boundServerOption(UndertowOptions.ALWAYS_SET_KEEP_ALIVE)).isFalse();
-	}
+    @Test
+    void customServerOption() {
+        bind("server.undertow.options.server.ALWAYS_SET_KEEP_ALIVE=false");
+        assertThat(boundServerOption(UndertowOptions.ALWAYS_SET_KEEP_ALIVE)).isFalse();
+    }
 
-	@Test
-	void customServerOptionShouldBeRelaxed() {
-		bind("server.undertow.options.server.always-set-keep-alive=false");
-		assertThat(boundServerOption(UndertowOptions.ALWAYS_SET_KEEP_ALIVE)).isFalse();
-	}
+    @Test
+    void customServerOptionShouldBeRelaxed() {
+        bind("server.undertow.options.server.always-set-keep-alive=false");
+        assertThat(boundServerOption(UndertowOptions.ALWAYS_SET_KEEP_ALIVE)).isFalse();
+    }
 
-	@Test
-	void customSocketOption() {
-		bind("server.undertow.options.socket.CONNECTION_LOW_WATER=8");
-		assertThat(boundSocketOption(Options.CONNECTION_LOW_WATER)).isEqualTo(8);
-	}
+    @Test
+    void customSocketOption() {
+        bind("server.undertow.options.socket.CONNECTION_LOW_WATER=8");
+        assertThat(boundSocketOption(Options.CONNECTION_LOW_WATER)).isEqualTo(8);
+    }
 
-	@Test
-	void customSocketOptionShouldBeRelaxed() {
-		bind("server.undertow.options.socket.connection-low-water=8");
-		assertThat(boundSocketOption(Options.CONNECTION_LOW_WATER)).isEqualTo(8);
-	}
+    @Test
+    void customSocketOptionShouldBeRelaxed() {
+        bind("server.undertow.options.socket.connection-low-water=8");
+        assertThat(boundSocketOption(Options.CONNECTION_LOW_WATER)).isEqualTo(8);
+    }
 
-	@Test
-	void deduceUseForwardHeaders() {
-		this.environment.setProperty("DYNO", "-");
-		ConfigurableUndertowWebServerFactory factory = mock(ConfigurableUndertowWebServerFactory.class);
-		this.customizer.customize(factory);
-		then(factory).should().setUseForwardHeaders(true);
-	}
+    @Test
+    void deduceUseForwardHeaders() {
+        this.environment.setProperty("DYNO", "-");
+        ConfigurableUndertowWebServerFactory factory = mock(ConfigurableUndertowWebServerFactory.class);
+        this.customizer.customize(factory);
+        then(factory).should().setUseForwardHeaders(true);
+    }
 
-	@Test
-	void defaultUseForwardHeaders() {
-		ConfigurableUndertowWebServerFactory factory = mock(ConfigurableUndertowWebServerFactory.class);
-		this.customizer.customize(factory);
-		then(factory).should().setUseForwardHeaders(false);
-	}
+    @Test
+    void defaultUseForwardHeaders() {
+        ConfigurableUndertowWebServerFactory factory = mock(ConfigurableUndertowWebServerFactory.class);
+        this.customizer.customize(factory);
+        then(factory).should().setUseForwardHeaders(false);
+    }
 
-	@Test
-	void forwardHeadersWhenStrategyIsNativeShouldConfigureValve() {
-		this.serverProperties.setForwardHeadersStrategy(ServerProperties.ForwardHeadersStrategy.NATIVE);
-		ConfigurableUndertowWebServerFactory factory = mock(ConfigurableUndertowWebServerFactory.class);
-		this.customizer.customize(factory);
-		then(factory).should().setUseForwardHeaders(true);
-	}
+    @Test
+    void forwardHeadersWhenStrategyIsNativeShouldConfigureValve() {
+        this.serverProperties.setForwardHeadersStrategy(ServerProperties.ForwardHeadersStrategy.NATIVE);
+        ConfigurableUndertowWebServerFactory factory = mock(ConfigurableUndertowWebServerFactory.class);
+        this.customizer.customize(factory);
+        then(factory).should().setUseForwardHeaders(true);
+    }
 
-	@Test
-	void forwardHeadersWhenStrategyIsNoneShouldNotConfigureValve() {
-		this.environment.setProperty("DYNO", "-");
-		this.serverProperties.setForwardHeadersStrategy(ServerProperties.ForwardHeadersStrategy.NONE);
-		ConfigurableUndertowWebServerFactory factory = mock(ConfigurableUndertowWebServerFactory.class);
-		this.customizer.customize(factory);
-		then(factory).should().setUseForwardHeaders(false);
-	}
+    @Test
+    void forwardHeadersWhenStrategyIsNoneShouldNotConfigureValve() {
+        this.environment.setProperty("DYNO", "-");
+        this.serverProperties.setForwardHeadersStrategy(ServerProperties.ForwardHeadersStrategy.NONE);
+        ConfigurableUndertowWebServerFactory factory = mock(ConfigurableUndertowWebServerFactory.class);
+        this.customizer.customize(factory);
+        then(factory).should().setUseForwardHeaders(false);
+    }
 
-	private <T> T boundServerOption(Option<T> option) {
-		Builder builder = Undertow.builder();
-		ConfigurableUndertowWebServerFactory factory = mockFactory(builder);
-		this.customizer.customize(factory);
-		OptionMap map = ((OptionMap.Builder) ReflectionTestUtils.getField(builder, "serverOptions")).getMap();
-		return map.get(option);
-	}
+    private <T> T boundServerOption(Option<T> option) {
+        Builder builder = Undertow.builder();
+        ConfigurableUndertowWebServerFactory factory = mockFactory(builder);
+        this.customizer.customize(factory);
+        OptionMap map = ((OptionMap.Builder) ReflectionTestUtils.getField(builder, "serverOptions")).getMap();
+        return map.get(option);
+    }
 
-	private <T> T boundSocketOption(Option<T> option) {
-		Builder builder = Undertow.builder();
-		ConfigurableUndertowWebServerFactory factory = mockFactory(builder);
-		this.customizer.customize(factory);
-		OptionMap map = ((OptionMap.Builder) ReflectionTestUtils.getField(builder, "socketOptions")).getMap();
-		return map.get(option);
-	}
+    private <T> T boundSocketOption(Option<T> option) {
+        Builder builder = Undertow.builder();
+        ConfigurableUndertowWebServerFactory factory = mockFactory(builder);
+        this.customizer.customize(factory);
+        OptionMap map = ((OptionMap.Builder) ReflectionTestUtils.getField(builder, "socketOptions")).getMap();
+        return map.get(option);
+    }
 
-	private ConfigurableUndertowWebServerFactory mockFactory(Builder builder) {
-		ConfigurableUndertowWebServerFactory factory = mock(ConfigurableUndertowWebServerFactory.class);
-		willAnswer((invocation) -> {
-			Object argument = invocation.getArgument(0);
-			Arrays.stream((argument instanceof UndertowBuilderCustomizer undertowCustomizer)
-					? new UndertowBuilderCustomizer[] { undertowCustomizer } : (UndertowBuilderCustomizer[]) argument)
-				.forEach((customizer) -> customizer.customize(builder));
-			return null;
-		}).given(factory).addBuilderCustomizers(any());
-		return factory;
-	}
+    private ConfigurableUndertowWebServerFactory mockFactory(Builder builder) {
+        ConfigurableUndertowWebServerFactory factory = mock(ConfigurableUndertowWebServerFactory.class);
+        willAnswer((invocation) -> {
+            Object argument = invocation.getArgument(0);
+            Arrays.stream((argument instanceof UndertowBuilderCustomizer undertowCustomizer)
+                    ? new UndertowBuilderCustomizer[] { undertowCustomizer } : (UndertowBuilderCustomizer[]) argument)
+                .forEach((customizer) -> customizer.customize(builder));
+            return null;
+        }).given(factory).addBuilderCustomizers(any());
+        return factory;
+    }
 
-	private void bind(String... inlinedProperties) {
-		TestPropertySourceUtils.addInlinedPropertiesToEnvironment(this.environment, inlinedProperties);
-		Binder binder = new Binder(ConfigurationPropertySources.get(this.environment));
-		binder.bind("server", Bindable.ofInstance(this.serverProperties));
-		binder.bind("server.undertow", Bindable.ofInstance(this.undertowProperties));
-	}
+    private void bind(String... inlinedProperties) {
+        TestPropertySourceUtils.addInlinedPropertiesToEnvironment(this.environment, inlinedProperties);
+        Binder binder = new Binder(ConfigurationPropertySources.get(this.environment));
+        binder.bind("server", Bindable.ofInstance(this.serverProperties));
+        binder.bind("server.undertow", Bindable.ofInstance(this.undertowProperties));
+    }
 
 }

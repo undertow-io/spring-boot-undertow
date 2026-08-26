@@ -38,68 +38,68 @@ import static org.mockito.Mockito.mock;
  */
 class UndertowReactiveWebServerAutoConfigurationTests extends AbstractReactiveWebServerAutoConfigurationTests {
 
-	UndertowReactiveWebServerAutoConfigurationTests() {
-		super(UndertowReactiveWebServerAutoConfiguration.class);
-	}
+    UndertowReactiveWebServerAutoConfigurationTests() {
+        super(UndertowReactiveWebServerAutoConfiguration.class);
+    }
 
-	@Test
-	void undertowBuilderCustomizerBeanIsAddedToFactory() {
-		this.serverRunner.withUserConfiguration(UndertowBuilderCustomizerConfiguration.class).run((context) -> {
-			UndertowReactiveWebServerFactory factory = context.getBean(UndertowReactiveWebServerFactory.class);
-			assertThat(factory.getBuilderCustomizers())
-				.contains(context.getBean("builderCustomizer", UndertowBuilderCustomizer.class));
-		});
-	}
+    @Test
+    void undertowBuilderCustomizerBeanIsAddedToFactory() {
+        this.serverRunner.withUserConfiguration(UndertowBuilderCustomizerConfiguration.class).run((context) -> {
+            UndertowReactiveWebServerFactory factory = context.getBean(UndertowReactiveWebServerFactory.class);
+            assertThat(factory.getBuilderCustomizers())
+                .contains(context.getBean("builderCustomizer", UndertowBuilderCustomizer.class));
+        });
+    }
 
-	@Test
-	void undertowBuilderCustomizerRegisteredAsBeanAndViaFactoryIsOnlyCalledOnce() {
-		this.serverRunner.withUserConfiguration(DoubleRegistrationUndertowBuilderCustomizerConfiguration.class)
-			.run((context) -> {
-				UndertowReactiveWebServerFactory factory = context.getBean(UndertowReactiveWebServerFactory.class);
-				UndertowBuilderCustomizer customizer = context.getBean("builderCustomizer",
-						UndertowBuilderCustomizer.class);
-				assertThat(factory.getBuilderCustomizers()).contains(customizer);
-				then(customizer).should().customize(any(Builder.class));
-			});
-	}
+    @Test
+    void undertowBuilderCustomizerRegisteredAsBeanAndViaFactoryIsOnlyCalledOnce() {
+        this.serverRunner.withUserConfiguration(DoubleRegistrationUndertowBuilderCustomizerConfiguration.class)
+            .run((context) -> {
+                UndertowReactiveWebServerFactory factory = context.getBean(UndertowReactiveWebServerFactory.class);
+                UndertowBuilderCustomizer customizer = context.getBean("builderCustomizer",
+                        UndertowBuilderCustomizer.class);
+                assertThat(factory.getBuilderCustomizers()).contains(customizer);
+                then(customizer).should().customize(any(Builder.class));
+            });
+    }
 
-	@Configuration(proxyBeanMethods = false)
-	static class UndertowBuilderCustomizerConfiguration {
+    @Configuration(proxyBeanMethods = false)
+    static class UndertowBuilderCustomizerConfiguration {
 
-		@Bean
-		UndertowBuilderCustomizer builderCustomizer() {
-			return (builder) -> {
-			};
-		}
+        @Bean
+        UndertowBuilderCustomizer builderCustomizer() {
+            return (builder) -> {
+            };
+        }
 
-	}
+    }
 
-	@Configuration(proxyBeanMethods = false)
-	static class DoubleRegistrationUndertowBuilderCustomizerConfiguration {
+    @Configuration(proxyBeanMethods = false)
+    static class DoubleRegistrationUndertowBuilderCustomizerConfiguration {
 
-		private final UndertowBuilderCustomizer customizer = mock(UndertowBuilderCustomizer.class);
+        private final UndertowBuilderCustomizer customizer = mock(UndertowBuilderCustomizer.class);
 
-		@Bean
-		UndertowBuilderCustomizer builderCustomizer() {
-			return this.customizer;
-		}
+        @Bean
+        UndertowBuilderCustomizer builderCustomizer() {
+            return this.customizer;
+        }
 
-		@Bean
-		WebServerFactoryCustomizer<UndertowReactiveWebServerFactory> undertowCustomizer() {
-			return (undertow) -> undertow.addBuilderCustomizers(this.customizer);
-		}
+        @Bean
+        WebServerFactoryCustomizer<UndertowReactiveWebServerFactory> undertowCustomizer() {
+            return (undertow) -> undertow.addBuilderCustomizers(this.customizer);
+        }
 
-	}
+    }
 
-	@Configuration(proxyBeanMethods = false)
-	static class UndertowDeploymentInfoCustomizerConfiguration {
+    @Configuration(proxyBeanMethods = false)
+    static class UndertowDeploymentInfoCustomizerConfiguration {
 
-		@Bean
-		UndertowDeploymentInfoCustomizer deploymentInfoCustomizer() {
-			return (deploymentInfo) -> {
-			};
-		}
+        @Bean
+        UndertowDeploymentInfoCustomizer deploymentInfoCustomizer() {
+            return (deploymentInfo) -> {
+            };
+        }
 
-	}
+    }
 
 }

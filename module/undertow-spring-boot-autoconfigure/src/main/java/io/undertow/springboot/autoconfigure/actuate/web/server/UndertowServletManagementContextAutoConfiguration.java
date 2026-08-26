@@ -41,10 +41,10 @@ import org.springframework.context.annotation.Bean;
 @ConditionalOnManagementPort(ManagementPortType.DIFFERENT)
 public final class UndertowServletManagementContextAutoConfiguration {
 
-	@Bean
-	static ManagementContextFactory servletWebChildContextFactory() {
-		return new ManagementContextFactory(WebApplicationType.SERVLET, ServletWebServerFactory.class,
-				UndertowServletWebServerAutoConfiguration.class);
-	}
+    @Bean
+    static ManagementContextFactory servletWebChildContextFactory() {
+        return new ManagementContextFactory(WebApplicationType.SERVLET, ServletWebServerFactory.class,
+                UndertowServletWebServerAutoConfiguration.class);
+    }
 
 }
