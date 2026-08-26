@@ -11,7 +11,7 @@
 
   <name>undertow-spring-boot-parent</name>
   <description>Parent POM for Spring Boot Undertow modules</description>
-  <url>https://spring.io/projects/spring-boot</url>
+  <url>https://github.com/undertow-io/spring-boot-undertow</url>
 
 
   <licenses>
