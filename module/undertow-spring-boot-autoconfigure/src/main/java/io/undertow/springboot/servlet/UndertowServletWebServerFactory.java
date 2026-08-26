@@ -48,6 +48,7 @@ import io.undertow.server.handlers.resource.Resource;
 import io.undertow.server.handlers.resource.ResourceChangeListener;
 import io.undertow.server.handlers.resource.ResourceManager;
 import io.undertow.server.handlers.resource.URLResource;
+import io.undertow.server.session.InMemorySessionManager;
 import io.undertow.server.session.SessionManager;
 import io.undertow.servlet.Servlets;
 import io.undertow.servlet.api.Deployment;
@@ -230,6 +231,11 @@ public class UndertowServletWebServerFactory extends UndertowWebServerFactory
 		deployment.setContextPath(getSettings().getContextPath().toString());
 		deployment.setDisplayName(getSettings().getDisplayName());
 		deployment.setDeploymentName("spring-boot");
+		// Undertow only enables session statistics when a MetricsCollector is configured.
+		// Enable them unconditionally so that the undertow.sessions.* metrics are meaningful.
+		deployment.setSessionManagerFactory((managerDeployment) -> new InMemorySessionManager(
+				managerDeployment.getDeploymentInfo().getSessionIdGenerator(),
+				managerDeployment.getDeploymentInfo().getDeploymentName(), -1, false, true));
 		if (getSettings().isRegisterDefaultServlet()) {
 			deployment.addServlet(Servlets.servlet("default", DefaultServlet.class));
 		}

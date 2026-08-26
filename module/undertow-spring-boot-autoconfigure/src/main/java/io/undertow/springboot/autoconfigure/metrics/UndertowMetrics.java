@@ -78,10 +78,14 @@ public class UndertowMetrics implements MeterBinder, AutoCloseable {
                 .description("Current worker thread count")
                 .register(registry);
 
+        // jboss-threads only tracks the active count when the
+        // jboss.threads.eqe.statistics.active-count system property is true; it
+        // returns -1 otherwise, which is reported as NaN rather than a bogus value.
         Gauge.builder("undertow.threads.worker.busy", xnioWorker,
-                    w -> safeDouble(() -> w.getMXBean().getBusyWorkerThreadCount()))
+                    w -> nonNegativeOrNaN(safeDouble(() -> w.getMXBean().getBusyWorkerThreadCount())))
                 .tags(tags).baseUnit(BaseUnits.THREADS)
-                .description("Busy worker thread count")
+                .description("Busy worker thread count (requires "
+                        + "-Djboss.threads.eqe.statistics.active-count=true)")
                 .register(registry);
 
         Gauge.builder("undertow.threads.worker.queue.size", xnioWorker,
@@ -109,10 +113,10 @@ public class UndertowMetrics implements MeterBinder, AutoCloseable {
 
         Gauge.builder("undertow.sessions.active.max", sessionManager,
                     m -> (m.getStatistics() != null)
-                            ? safeDouble(() -> m.getStatistics().getMaxActiveSessions())
+                            ? nonNegativeOrNaN(safeDouble(() -> m.getStatistics().getMaxActiveSessions()))
                             : Double.NaN)
                 .tags(tags).baseUnit(BaseUnits.SESSIONS)
-                .description("Maximum sessions allowed")
+                .description("Maximum sessions allowed (NaN when unlimited)")
                 .register(registry);
 
         FunctionCounter.builder("undertow.sessions.created", sessionManager,
@@ -140,6 +144,10 @@ public class UndertowMetrics implements MeterBinder, AutoCloseable {
             return safeDouble(() -> deployment.getSessionManager().getActiveSessions().size());
         }
         return Double.NaN;
+    }
+
+    private static double nonNegativeOrNaN(double value) {
+        return (value < 0) ? Double.NaN : value;
     }
 
     private double safeDouble(Supplier<Object> supplier) {
