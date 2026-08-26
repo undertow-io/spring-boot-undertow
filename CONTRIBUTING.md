@@ -104,7 +104,7 @@ git checkout -b my_cool_feature
 Make whatever code changes, including new tests to verify your change, and make sure the project builds without errors:
 
 ```bash
-mvn clean verify
+./mvnw clean verify
 ```
 
 > If you're making non code changes, the above step is not required.
@@ -182,7 +182,7 @@ It is a good practice to create a backup of your original branch in case you end
 reload your original fix (the GitHub remote origin account containing the PR can serve this purpose, as long as you don't
 overwrite it with a broken branch).
 
-Once you are satisfied with your commits, run the tests again with `mvn clean verify`. Finally, check the changes you are going
+Once you are satisfied with your commits, run the tests again with `./mvnw clean verify`. Finally, check the changes you are going
 to push to origin are really okay with:
 
 ```bash
