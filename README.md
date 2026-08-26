@@ -14,10 +14,10 @@ This project fills that gap using [Undertow EE](https://github.com/undertow-io/u
 spring-boot-undertow/
 ├── pom.xml                                       <- parent POM
 ├── module/
-│   └── spring-boot-undertow/                     <- core Undertow integration
+│   └── undertow-spring-boot-autoconfigure/       <- core Undertow integration
 │       └── pom.xml
 └── starter/
-    └── spring-boot-starter-undertow/             <- Undertow starter
+    └── undertow-spring-boot-starter/             <- Undertow starter
         └── pom.xml
 ```
 
@@ -27,8 +27,8 @@ Add the starter to your Spring Boot 4 project:
 
 ```xml
 <dependency>
-    <groupId>com.redhat.integration</groupId>
-    <artifactId>spring-boot-starter-undertow</artifactId>
+    <groupId>io.undertow</groupId>
+    <artifactId>undertow-spring-boot-starter</artifactId>
     <version>${undertow-starter.version}</version>
 </dependency>
 ```
@@ -79,7 +79,7 @@ git checkout v4.0.6
 
 # 2. Run the TCK tests with the 'tck' profile
 cd /path/to/spring-boot-undertow
-mvn test -pl module/spring-boot-undertow -Ptck
+mvn test -pl module/undertow-spring-boot-autoconfigure -Ptck
 ```
 
 **Test results:** 222 tests, 214 pass, 6 skipped, 8 known incompatibilities:
