@@ -31,15 +31,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 class UndertowStarterIntegrationTests {
 
-	@Test
-	void undertowStartsAsEmbeddedServer(WebServerApplicationContext context) {
-		assertThat(context.getWebServer()).isInstanceOf(UndertowWebServer.class);
-	}
+    @Test
+    void undertowStartsAsEmbeddedServer(WebServerApplicationContext context) {
+        assertThat(context.getWebServer()).isInstanceOf(UndertowWebServer.class);
+    }
 
-	@Configuration(proxyBeanMethods = false)
-	@EnableAutoConfiguration
-	static class TestApplication {
+    @Configuration(proxyBeanMethods = false)
+    @EnableAutoConfiguration
+    static class TestApplication {
 
-	}
+    }
 
 }
