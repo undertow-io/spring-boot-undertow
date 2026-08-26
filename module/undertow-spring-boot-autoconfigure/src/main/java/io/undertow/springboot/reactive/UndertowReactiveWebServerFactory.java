@@ -17,6 +17,8 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Executor;
+import java.util.concurrent.RejectedExecutionException;
 
 import io.undertow.Undertow;
 import io.undertow.server.HttpHandler;
@@ -29,7 +31,10 @@ import jakarta.servlet.ServletContainerInitializer;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRegistration;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jspecify.annotations.Nullable;
+import org.xnio.XnioWorker;
 
 import io.undertow.springboot.ConfigurableUndertowWebServerFactory;
 import io.undertow.springboot.HttpHandlerFactory;
@@ -87,6 +92,8 @@ public class UndertowReactiveWebServerFactory extends UndertowWebServerFactory
 			deployment.setClassLoader(getClass().getClassLoader());
 			deployment.setContextPath("/");
 			deployment.setDeploymentName("spring-boot-reactive");
+			WorkerFallbackExecutor asyncExecutor = new WorkerFallbackExecutor();
+			deployment.setAsyncExecutor(asyncExecutor);
 			deployment.addServletContainerInitializer(new ServletContainerInitializerInfo(
 					ReactiveServletInitializer.class,
 					new ImmediateInstanceFactory<>(new ReactiveServletInitializer(this.servlet)),
@@ -94,7 +101,7 @@ public class UndertowReactiveWebServerFactory extends UndertowWebServerFactory
 			DeploymentManager manager = Servlets.newContainer().addDeployment(deployment);
 			manager.deploy();
 			try {
-				return new DeploymentHandler(manager, manager.start());
+				return new DeploymentHandler(manager, manager.start(), asyncExecutor);
 			}
 			catch (ServletException ex) {
 				throw new RuntimeException(ex);
@@ -108,13 +115,17 @@ public class UndertowReactiveWebServerFactory extends UndertowWebServerFactory
 		private final DeploymentManager manager;
 		private final HttpHandler handler;
 
-		DeploymentHandler(DeploymentManager manager, HttpHandler handler) {
+		private final WorkerFallbackExecutor asyncExecutor;
+
+		DeploymentHandler(DeploymentManager manager, HttpHandler handler, WorkerFallbackExecutor asyncExecutor) {
 			this.manager = manager;
 			this.handler = handler;
+			this.asyncExecutor = asyncExecutor;
 		}
 
 		@Override
 		public void handleRequest(io.undertow.server.HttpServerExchange exchange) throws Exception {
+			this.asyncExecutor.setWorker(exchange.getConnection().getWorker());
 			this.handler.handleRequest(exchange);
 		}
 
@@ -126,6 +137,50 @@ public class UndertowReactiveWebServerFactory extends UndertowWebServerFactory
 			}
 			catch (ServletException ex) {
 				throw new RuntimeException(ex);
+			}
+		}
+
+	}
+
+	/**
+	 * Async {@link Executor} that delegates to the XNIO worker while it is running and
+	 * falls back to executing on the calling thread once the worker has been shut down.
+	 * {@code Undertow.stop()} shuts the worker down while requests may still be in
+	 * flight; without the fallback, completing such a request (which the servlet bridge
+	 * does via {@code AsyncContext.complete()}) fails with a
+	 * {@link RejectedExecutionException} instead of finishing.
+	 */
+	static final class WorkerFallbackExecutor implements Executor {
+
+		private static final Log logger = LogFactory.getLog(WorkerFallbackExecutor.class);
+
+		private volatile @Nullable XnioWorker worker;
+
+		void setWorker(XnioWorker worker) {
+			if (this.worker == null) {
+				this.worker = worker;
+			}
+		}
+
+		@Override
+		public void execute(Runnable task) {
+			XnioWorker worker = this.worker;
+			if (worker != null && !worker.isShutdown()) {
+				try {
+					worker.execute(task);
+					return;
+				}
+				catch (RejectedExecutionException ex) {
+					// Worker shut down concurrently; run on the calling thread instead
+				}
+			}
+			try {
+				task.run();
+			}
+			catch (RejectedExecutionException ex) {
+				// The server is shutting down and its IO threads are gone; the response for
+				// this in-flight request can no longer be written, which is expected.
+				logger.debug("Dropped async task for in-flight request during shutdown", ex);
 			}
 		}
 
