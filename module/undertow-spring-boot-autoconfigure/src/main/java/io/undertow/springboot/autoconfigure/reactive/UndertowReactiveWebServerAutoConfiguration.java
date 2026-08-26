@@ -49,13 +49,13 @@ import org.springframework.http.ReactiveHttpInputMessage;
 @Import({ UndertowWebServerConfiguration.class, ReactiveWebServerConfiguration.class })
 public final class UndertowReactiveWebServerAutoConfiguration {
 
-	@Bean
-	@ConditionalOnMissingBean(ReactiveWebServerFactory.class)
-	UndertowReactiveWebServerFactory undertowReactiveWebServerFactory(
-			ObjectProvider<UndertowBuilderCustomizer> builderCustomizers) {
-		UndertowReactiveWebServerFactory factory = new UndertowReactiveWebServerFactory();
-		factory.getBuilderCustomizers().addAll(builderCustomizers.orderedStream().toList());
-		return factory;
-	}
+    @Bean
+    @ConditionalOnMissingBean(ReactiveWebServerFactory.class)
+    UndertowReactiveWebServerFactory undertowReactiveWebServerFactory(
+            ObjectProvider<UndertowBuilderCustomizer> builderCustomizers) {
+        UndertowReactiveWebServerFactory factory = new UndertowReactiveWebServerFactory();
+        factory.getBuilderCustomizers().addAll(builderCustomizers.orderedStream().toList());
+        return factory;
+    }
 
 }

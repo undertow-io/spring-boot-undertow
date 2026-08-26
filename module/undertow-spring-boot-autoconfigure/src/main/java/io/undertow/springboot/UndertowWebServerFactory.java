@@ -48,189 +48,189 @@ import org.springframework.util.StringUtils;
  * @since 4.0.0
  */
 public abstract class UndertowWebServerFactory extends AbstractConfigurableWebServerFactory
-		implements ConfigurableUndertowWebServerFactory {
+        implements ConfigurableUndertowWebServerFactory {
 
-	private Set<UndertowBuilderCustomizer> builderCustomizers = new LinkedHashSet<>();
+    private Set<UndertowBuilderCustomizer> builderCustomizers = new LinkedHashSet<>();
 
-	private @Nullable Integer bufferSize;
+    private @Nullable Integer bufferSize;
 
-	private @Nullable Integer ioThreads;
+    private @Nullable Integer ioThreads;
 
-	private @Nullable Integer workerThreads;
+    private @Nullable Integer workerThreads;
 
-	private @Nullable Boolean directBuffers;
+    private @Nullable Boolean directBuffers;
 
-	private @Nullable File accessLogDirectory;
+    private @Nullable File accessLogDirectory;
 
-	private @Nullable String accessLogPattern;
+    private @Nullable String accessLogPattern;
 
-	private @Nullable String accessLogPrefix;
+    private @Nullable String accessLogPrefix;
 
-	private @Nullable String accessLogSuffix;
+    private @Nullable String accessLogSuffix;
 
-	private boolean accessLogEnabled;
+    private boolean accessLogEnabled;
 
-	private boolean accessLogRotate = true;
+    private boolean accessLogRotate = true;
 
-	private boolean useForwardHeaders;
+    private boolean useForwardHeaders;
 
-	protected UndertowWebServerFactory() {
-	}
+    protected UndertowWebServerFactory() {
+    }
 
-	protected UndertowWebServerFactory(int port) {
-		super(port);
-	}
+    protected UndertowWebServerFactory(int port) {
+        super(port);
+    }
 
-	public Collection<UndertowBuilderCustomizer> getBuilderCustomizers() {
-		return this.builderCustomizers;
-	}
+    public Collection<UndertowBuilderCustomizer> getBuilderCustomizers() {
+        return this.builderCustomizers;
+    }
 
-	@Override
-	public void setBuilderCustomizers(Collection<? extends UndertowBuilderCustomizer> customizers) {
-		Assert.notNull(customizers, "'customizers' must not be null");
-		this.builderCustomizers = new LinkedHashSet<>(customizers);
-	}
+    @Override
+    public void setBuilderCustomizers(Collection<? extends UndertowBuilderCustomizer> customizers) {
+        Assert.notNull(customizers, "'customizers' must not be null");
+        this.builderCustomizers = new LinkedHashSet<>(customizers);
+    }
 
-	@Override
-	public void addBuilderCustomizers(UndertowBuilderCustomizer... customizers) {
-		Assert.notNull(customizers, "'customizers' must not be null");
-		this.builderCustomizers.addAll(Arrays.asList(customizers));
-	}
+    @Override
+    public void addBuilderCustomizers(UndertowBuilderCustomizer... customizers) {
+        Assert.notNull(customizers, "'customizers' must not be null");
+        this.builderCustomizers.addAll(Arrays.asList(customizers));
+    }
 
-	@Override
-	public void setBufferSize(@Nullable Integer bufferSize) {
-		this.bufferSize = bufferSize;
-	}
+    @Override
+    public void setBufferSize(@Nullable Integer bufferSize) {
+        this.bufferSize = bufferSize;
+    }
 
-	@Override
-	public void setIoThreads(@Nullable Integer ioThreads) {
-		this.ioThreads = ioThreads;
-	}
+    @Override
+    public void setIoThreads(@Nullable Integer ioThreads) {
+        this.ioThreads = ioThreads;
+    }
 
-	@Override
-	public void setWorkerThreads(@Nullable Integer workerThreads) {
-		this.workerThreads = workerThreads;
-	}
+    @Override
+    public void setWorkerThreads(@Nullable Integer workerThreads) {
+        this.workerThreads = workerThreads;
+    }
 
-	@Override
-	public void setUseDirectBuffers(@Nullable Boolean directBuffers) {
-		this.directBuffers = directBuffers;
-	}
+    @Override
+    public void setUseDirectBuffers(@Nullable Boolean directBuffers) {
+        this.directBuffers = directBuffers;
+    }
 
-	@Override
-	public void setAccessLogDirectory(@Nullable File accessLogDirectory) {
-		this.accessLogDirectory = accessLogDirectory;
-	}
+    @Override
+    public void setAccessLogDirectory(@Nullable File accessLogDirectory) {
+        this.accessLogDirectory = accessLogDirectory;
+    }
 
-	@Override
-	public void setAccessLogPattern(@Nullable String accessLogPattern) {
-		this.accessLogPattern = accessLogPattern;
-	}
+    @Override
+    public void setAccessLogPattern(@Nullable String accessLogPattern) {
+        this.accessLogPattern = accessLogPattern;
+    }
 
-	@Override
-	public void setAccessLogPrefix(@Nullable String accessLogPrefix) {
-		this.accessLogPrefix = accessLogPrefix;
-	}
+    @Override
+    public void setAccessLogPrefix(@Nullable String accessLogPrefix) {
+        this.accessLogPrefix = accessLogPrefix;
+    }
 
-	public @Nullable String getAccessLogPrefix() {
-		return this.accessLogPrefix;
-	}
+    public @Nullable String getAccessLogPrefix() {
+        return this.accessLogPrefix;
+    }
 
-	@Override
-	public void setAccessLogSuffix(@Nullable String accessLogSuffix) {
-		this.accessLogSuffix = accessLogSuffix;
-	}
+    @Override
+    public void setAccessLogSuffix(@Nullable String accessLogSuffix) {
+        this.accessLogSuffix = accessLogSuffix;
+    }
 
-	@Override
-	public void setAccessLogEnabled(boolean accessLogEnabled) {
-		this.accessLogEnabled = accessLogEnabled;
-	}
+    @Override
+    public void setAccessLogEnabled(boolean accessLogEnabled) {
+        this.accessLogEnabled = accessLogEnabled;
+    }
 
-	public boolean isAccessLogEnabled() {
-		return this.accessLogEnabled;
-	}
+    public boolean isAccessLogEnabled() {
+        return this.accessLogEnabled;
+    }
 
-	@Override
-	public void setAccessLogRotate(boolean accessLogRotate) {
-		this.accessLogRotate = accessLogRotate;
-	}
+    @Override
+    public void setAccessLogRotate(boolean accessLogRotate) {
+        this.accessLogRotate = accessLogRotate;
+    }
 
-	@Override
-	public void setUseForwardHeaders(boolean useForwardHeaders) {
-		this.useForwardHeaders = useForwardHeaders;
-	}
+    @Override
+    public void setUseForwardHeaders(boolean useForwardHeaders) {
+        this.useForwardHeaders = useForwardHeaders;
+    }
 
-	public boolean isUseForwardHeaders() {
-		return this.useForwardHeaders;
-	}
+    public boolean isUseForwardHeaders() {
+        return this.useForwardHeaders;
+    }
 
-	public Builder createBuilder(AbstractConfigurableWebServerFactory factory, Supplier<SslBundle> sslBundleSupplier,
-			Supplier<Map<String, SslBundle>> serverNameSslBundlesSupplier) {
-		InetAddress address = factory.getAddress();
-		int port = factory.getPort();
-		Builder builder = Undertow.builder();
-		if (this.bufferSize != null) {
-			builder.setBufferSize(this.bufferSize);
-		}
-		if (this.ioThreads != null) {
-			builder.setIoThreads(this.ioThreads);
-		}
-		if (this.workerThreads != null) {
-			builder.setWorkerThreads(this.workerThreads);
-		}
-		if (this.directBuffers != null) {
-			builder.setDirectBuffers(this.directBuffers);
-		}
-		Http2 http2 = factory.getHttp2();
-		if (http2 != null) {
-			builder.setServerOption(UndertowOptions.ENABLE_HTTP2, http2.isEnabled());
-		}
-		Ssl ssl = factory.getSsl();
-		if (Ssl.isEnabled(ssl)) {
-			new SslBuilderCustomizer(factory.getPort(), address, ssl.getClientAuth(), sslBundleSupplier.get(),
-					serverNameSslBundlesSupplier.get())
-				.customize(builder);
-		}
-		else {
-			builder.addHttpListener(port, (address != null) ? address.getHostAddress() : "0.0.0.0");
-		}
-		builder.setServerOption(UndertowOptions.SHUTDOWN_TIMEOUT, 0);
-		for (UndertowBuilderCustomizer customizer : this.builderCustomizers) {
-			customizer.customize(builder);
-		}
-		return builder;
-	}
+    public Builder createBuilder(AbstractConfigurableWebServerFactory factory, Supplier<SslBundle> sslBundleSupplier,
+            Supplier<Map<String, SslBundle>> serverNameSslBundlesSupplier) {
+        InetAddress address = factory.getAddress();
+        int port = factory.getPort();
+        Builder builder = Undertow.builder();
+        if (this.bufferSize != null) {
+            builder.setBufferSize(this.bufferSize);
+        }
+        if (this.ioThreads != null) {
+            builder.setIoThreads(this.ioThreads);
+        }
+        if (this.workerThreads != null) {
+            builder.setWorkerThreads(this.workerThreads);
+        }
+        if (this.directBuffers != null) {
+            builder.setDirectBuffers(this.directBuffers);
+        }
+        Http2 http2 = factory.getHttp2();
+        if (http2 != null) {
+            builder.setServerOption(UndertowOptions.ENABLE_HTTP2, http2.isEnabled());
+        }
+        Ssl ssl = factory.getSsl();
+        if (Ssl.isEnabled(ssl)) {
+            new SslBuilderCustomizer(factory.getPort(), address, ssl.getClientAuth(), sslBundleSupplier.get(),
+                    serverNameSslBundlesSupplier.get())
+                .customize(builder);
+        }
+        else {
+            builder.addHttpListener(port, (address != null) ? address.getHostAddress() : "0.0.0.0");
+        }
+        builder.setServerOption(UndertowOptions.SHUTDOWN_TIMEOUT, 0);
+        for (UndertowBuilderCustomizer customizer : this.builderCustomizers) {
+            customizer.customize(builder);
+        }
+        return builder;
+    }
 
-	public List<HttpHandlerFactory> createHttpHandlerFactories(AbstractConfigurableWebServerFactory webServerFactory,
-			HttpHandlerFactory... initialHttpHandlerFactories) {
-		List<HttpHandlerFactory> factories = createHttpHandlerFactories(webServerFactory.getCompression(),
-				this.useForwardHeaders, webServerFactory.getServerHeader(), webServerFactory.getShutdown(),
-				initialHttpHandlerFactories);
-		if (isAccessLogEnabled()) {
-			Assert.state(this.accessLogDirectory != null, "Access log directory is not set");
-			factories.add(new AccessLogHttpHandlerFactory(this.accessLogDirectory, this.accessLogPattern,
-					this.accessLogPrefix, this.accessLogSuffix, this.accessLogRotate));
-		}
-		return factories;
-	}
+    public List<HttpHandlerFactory> createHttpHandlerFactories(AbstractConfigurableWebServerFactory webServerFactory,
+            HttpHandlerFactory... initialHttpHandlerFactories) {
+        List<HttpHandlerFactory> factories = createHttpHandlerFactories(webServerFactory.getCompression(),
+                this.useForwardHeaders, webServerFactory.getServerHeader(), webServerFactory.getShutdown(),
+                initialHttpHandlerFactories);
+        if (isAccessLogEnabled()) {
+            Assert.state(this.accessLogDirectory != null, "Access log directory is not set");
+            factories.add(new AccessLogHttpHandlerFactory(this.accessLogDirectory, this.accessLogPattern,
+                    this.accessLogPrefix, this.accessLogSuffix, this.accessLogRotate));
+        }
+        return factories;
+    }
 
-	static List<HttpHandlerFactory> createHttpHandlerFactories(@Nullable Compression compression,
-			boolean useForwardHeaders, @Nullable String serverHeader, Shutdown shutdown,
-			HttpHandlerFactory... initialHttpHandlerFactories) {
-		List<HttpHandlerFactory> factories = new ArrayList<>(Arrays.asList(initialHttpHandlerFactories));
-		if (compression != null && compression.getEnabled()) {
-			factories.add(new CompressionHttpHandlerFactory(compression));
-		}
-		if (useForwardHeaders) {
-			factories.add(Handlers::proxyPeerAddress);
-		}
-		if (StringUtils.hasText(serverHeader)) {
-			factories.add((next) -> Handlers.header(next, "Server", serverHeader));
-		}
-		if (shutdown == Shutdown.GRACEFUL) {
-			factories.add(Handlers::gracefulShutdown);
-		}
-		return factories;
-	}
+    static List<HttpHandlerFactory> createHttpHandlerFactories(@Nullable Compression compression,
+            boolean useForwardHeaders, @Nullable String serverHeader, Shutdown shutdown,
+            HttpHandlerFactory... initialHttpHandlerFactories) {
+        List<HttpHandlerFactory> factories = new ArrayList<>(Arrays.asList(initialHttpHandlerFactories));
+        if (compression != null && compression.getEnabled()) {
+            factories.add(new CompressionHttpHandlerFactory(compression));
+        }
+        if (useForwardHeaders) {
+            factories.add(Handlers::proxyPeerAddress);
+        }
+        if (StringUtils.hasText(serverHeader)) {
+            factories.add((next) -> Handlers.header(next, "Server", serverHeader));
+        }
+        if (shutdown == Shutdown.GRACEFUL) {
+            factories.add(Handlers::gracefulShutdown);
+        }
+        return factories;
+    }
 
 }

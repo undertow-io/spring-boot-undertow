@@ -27,10 +27,10 @@ import io.undertow.servlet.api.DeploymentInfo;
 @FunctionalInterface
 public interface UndertowDeploymentInfoCustomizer {
 
-	/**
-	 * Customize the deployment info.
-	 * @param deploymentInfo the {@code DeploymentInfo} to customize
-	 */
-	void customize(DeploymentInfo deploymentInfo);
+    /**
+     * Customize the deployment info.
+     * @param deploymentInfo the {@code DeploymentInfo} to customize
+     */
+    void customize(DeploymentInfo deploymentInfo);
 
 }

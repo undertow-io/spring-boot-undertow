@@ -22,12 +22,12 @@ package io.undertow.springboot;
  */
 public final class UndertowAccess {
 
-	private UndertowAccess() {
+    private UndertowAccess() {
 
-	}
+    }
 
-	public static String getStartedLogMessage(UndertowWebServer undertowWebServer) {
-		return undertowWebServer.getStartedLogMessage();
-	}
+    public static String getStartedLogMessage(UndertowWebServer undertowWebServer) {
+        return undertowWebServer.getStartedLogMessage();
+    }
 
 }

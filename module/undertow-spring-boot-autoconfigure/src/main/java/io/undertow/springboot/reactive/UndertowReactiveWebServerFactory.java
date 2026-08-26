@@ -50,103 +50,103 @@ import org.springframework.http.server.reactive.ServletHttpHandlerAdapter;
  * @since 4.0.0
  */
 public class UndertowReactiveWebServerFactory extends UndertowWebServerFactory
-		implements ConfigurableUndertowWebServerFactory, ConfigurableReactiveWebServerFactory {
+        implements ConfigurableUndertowWebServerFactory, ConfigurableReactiveWebServerFactory {
 
-	public UndertowReactiveWebServerFactory() {
-	}
+    public UndertowReactiveWebServerFactory() {
+    }
 
-	public UndertowReactiveWebServerFactory(int port) {
-		super(port);
-	}
+    public UndertowReactiveWebServerFactory(int port) {
+        super(port);
+    }
 
-	@Override
-	public WebServer getWebServer(org.springframework.http.server.reactive.HttpHandler httpHandler) {
-		ServletHttpHandlerAdapter servlet = new ServletHttpHandlerAdapter(httpHandler);
-		Undertow.Builder builder = createBuilder(this, this::getSslBundle, this::getServerNameSslBundles);
-		List<HttpHandlerFactory> httpHandlerFactories = createHttpHandlerFactories(this,
-				new ReactiveHttpHandlerFactory(servlet));
-		return new UndertowWebServer(builder, httpHandlerFactories, getPort() >= 0);
-	}
+    @Override
+    public WebServer getWebServer(org.springframework.http.server.reactive.HttpHandler httpHandler) {
+        ServletHttpHandlerAdapter servlet = new ServletHttpHandlerAdapter(httpHandler);
+        Undertow.Builder builder = createBuilder(this, this::getSslBundle, this::getServerNameSslBundles);
+        List<HttpHandlerFactory> httpHandlerFactories = createHttpHandlerFactories(this,
+                new ReactiveHttpHandlerFactory(servlet));
+        return new UndertowWebServer(builder, httpHandlerFactories, getPort() >= 0);
+    }
 
-	/**
-	 * {@link HttpHandlerFactory} that creates a fresh Undertow servlet deployment for
-	 * each call, wrapping the reactive {@link ServletHttpHandlerAdapter}. This supports
-	 * stop/start cycles because a new deployment is created on each start.
-	 */
-	private static class ReactiveHttpHandlerFactory implements HttpHandlerFactory {
+    /**
+     * {@link HttpHandlerFactory} that creates a fresh Undertow servlet deployment for
+     * each call, wrapping the reactive {@link ServletHttpHandlerAdapter}. This supports
+     * stop/start cycles because a new deployment is created on each start.
+     */
+    private static class ReactiveHttpHandlerFactory implements HttpHandlerFactory {
 
-		private final ServletHttpHandlerAdapter servlet;
+        private final ServletHttpHandlerAdapter servlet;
 
-		ReactiveHttpHandlerFactory(ServletHttpHandlerAdapter servlet) {
-			this.servlet = servlet;
-		}
+        ReactiveHttpHandlerFactory(ServletHttpHandlerAdapter servlet) {
+            this.servlet = servlet;
+        }
 
-		@Override
-		public @Nullable HttpHandler getHandler(@Nullable HttpHandler next) {
-			DeploymentInfo deployment = Servlets.deployment();
-			deployment.setClassLoader(getClass().getClassLoader());
-			deployment.setContextPath("/");
-			deployment.setDeploymentName("spring-boot-reactive");
-			deployment.addServletContainerInitializer(new ServletContainerInitializerInfo(
-					ReactiveServletInitializer.class,
-					new ImmediateInstanceFactory<>(new ReactiveServletInitializer(this.servlet)),
-					Set.of()));
-			DeploymentManager manager = Servlets.newContainer().addDeployment(deployment);
-			manager.deploy();
-			try {
-				return new DeploymentHandler(manager, manager.start());
-			}
-			catch (ServletException ex) {
-				throw new RuntimeException(ex);
-			}
-		}
+        @Override
+        public @Nullable HttpHandler getHandler(@Nullable HttpHandler next) {
+            DeploymentInfo deployment = Servlets.deployment();
+            deployment.setClassLoader(getClass().getClassLoader());
+            deployment.setContextPath("/");
+            deployment.setDeploymentName("spring-boot-reactive");
+            deployment.addServletContainerInitializer(new ServletContainerInitializerInfo(
+                    ReactiveServletInitializer.class,
+                    new ImmediateInstanceFactory<>(new ReactiveServletInitializer(this.servlet)),
+                    Set.of()));
+            DeploymentManager manager = Servlets.newContainer().addDeployment(deployment);
+            manager.deploy();
+            try {
+                return new DeploymentHandler(manager, manager.start());
+            }
+            catch (ServletException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
 
-	}
+    }
 
-	private static class DeploymentHandler implements HttpHandler, Closeable {
+    private static class DeploymentHandler implements HttpHandler, Closeable {
 
-		private final DeploymentManager manager;
-		private final HttpHandler handler;
+        private final DeploymentManager manager;
+        private final HttpHandler handler;
 
-		DeploymentHandler(DeploymentManager manager, HttpHandler handler) {
-			this.manager = manager;
-			this.handler = handler;
-		}
+        DeploymentHandler(DeploymentManager manager, HttpHandler handler) {
+            this.manager = manager;
+            this.handler = handler;
+        }
 
-		@Override
-		public void handleRequest(io.undertow.server.HttpServerExchange exchange) throws Exception {
-			this.handler.handleRequest(exchange);
-		}
+        @Override
+        public void handleRequest(io.undertow.server.HttpServerExchange exchange) throws Exception {
+            this.handler.handleRequest(exchange);
+        }
 
-		@Override
-		public void close() throws IOException {
-			try {
-				this.manager.stop();
-				this.manager.undeploy();
-			}
-			catch (ServletException ex) {
-				throw new RuntimeException(ex);
-			}
-		}
+        @Override
+        public void close() throws IOException {
+            try {
+                this.manager.stop();
+                this.manager.undeploy();
+            }
+            catch (ServletException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
 
-	}
+    }
 
-	private static class ReactiveServletInitializer implements ServletContainerInitializer {
+    private static class ReactiveServletInitializer implements ServletContainerInitializer {
 
-		private final ServletHttpHandlerAdapter servlet;
+        private final ServletHttpHandlerAdapter servlet;
 
-		ReactiveServletInitializer(ServletHttpHandlerAdapter servlet) {
-			this.servlet = servlet;
-		}
+        ReactiveServletInitializer(ServletHttpHandlerAdapter servlet) {
+            this.servlet = servlet;
+        }
 
-		@Override
-		public void onStartup(Set<Class<?>> classes, ServletContext servletContext) throws ServletException {
-			ServletRegistration.Dynamic registration = servletContext.addServlet("http-handler-adapter", this.servlet);
-			registration.setLoadOnStartup(1);
-			registration.addMapping("/");
-			registration.setAsyncSupported(true);
-		}
+        @Override
+        public void onStartup(Set<Class<?>> classes, ServletContext servletContext) throws ServletException {
+            ServletRegistration.Dynamic registration = servletContext.addServlet("http-handler-adapter", this.servlet);
+            registration.setLoadOnStartup(1);
+            registration.addMapping("/");
+            registration.setAsyncSupported(true);
+        }
 
-	}
+    }
 
 }

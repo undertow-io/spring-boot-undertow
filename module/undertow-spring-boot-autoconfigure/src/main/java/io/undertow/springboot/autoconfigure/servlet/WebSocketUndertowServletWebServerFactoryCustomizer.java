@@ -30,27 +30,27 @@ import org.springframework.core.Ordered;
  * @since 4.0.0
  */
 public class WebSocketUndertowServletWebServerFactoryCustomizer
-		implements WebServerFactoryCustomizer<UndertowServletWebServerFactory>, Ordered {
+        implements WebServerFactoryCustomizer<UndertowServletWebServerFactory>, Ordered {
 
-	@Override
-	public void customize(UndertowServletWebServerFactory factory) {
-		WebsocketDeploymentInfoCustomizer customizer = new WebsocketDeploymentInfoCustomizer();
-		factory.addDeploymentInfoCustomizers(customizer);
-	}
+    @Override
+    public void customize(UndertowServletWebServerFactory factory) {
+        WebsocketDeploymentInfoCustomizer customizer = new WebsocketDeploymentInfoCustomizer();
+        factory.addDeploymentInfoCustomizers(customizer);
+    }
 
-	@Override
-	public int getOrder() {
-		return 0;
-	}
+    @Override
+    public int getOrder() {
+        return 0;
+    }
 
-	private static final class WebsocketDeploymentInfoCustomizer implements UndertowDeploymentInfoCustomizer {
+    private static final class WebsocketDeploymentInfoCustomizer implements UndertowDeploymentInfoCustomizer {
 
-		@Override
-		public void customize(DeploymentInfo deploymentInfo) {
-			WebSocketDeploymentInfo info = new WebSocketDeploymentInfo();
-			deploymentInfo.addServletContextAttribute(WebSocketDeploymentInfo.ATTRIBUTE_NAME, info);
-		}
+        @Override
+        public void customize(DeploymentInfo deploymentInfo) {
+            WebSocketDeploymentInfo info = new WebSocketDeploymentInfo();
+            deploymentInfo.addServletContextAttribute(WebSocketDeploymentInfo.ATTRIBUTE_NAME, info);
+        }
 
-	}
+    }
 
 }

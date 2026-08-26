@@ -29,10 +29,10 @@ import io.undertow.springboot.servlet.UndertowServletWebServerFactory;
 @FunctionalInterface
 public interface UndertowBuilderCustomizer {
 
-	/**
-	 * Customize the builder.
-	 * @param builder the {@code Builder} to customize
-	 */
-	void customize(Builder builder);
+    /**
+     * Customize the builder.
+     * @param builder the {@code Builder} to customize
+     */
+    void customize(Builder builder);
 
 }

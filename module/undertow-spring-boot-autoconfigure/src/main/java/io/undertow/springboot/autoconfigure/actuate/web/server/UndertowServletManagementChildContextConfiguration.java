@@ -39,10 +39,10 @@ import org.springframework.context.annotation.Bean;
 @ManagementContextConfiguration(value = ManagementContextType.CHILD, proxyBeanMethods = false)
 class UndertowServletManagementChildContextConfiguration {
 
-	@Bean
-	UndertowAccessLogCustomizer<UndertowServletWebServerFactory> undertowManagementAccessLogCustomizer(
-			UndertowManagementServerProperties properties) {
-		return new UndertowAccessLogCustomizer<>(properties, UndertowServletWebServerFactory::getAccessLogPrefix);
-	}
+    @Bean
+    UndertowAccessLogCustomizer<UndertowServletWebServerFactory> undertowManagementAccessLogCustomizer(
+            UndertowManagementServerProperties properties) {
+        return new UndertowAccessLogCustomizer<>(properties, UndertowServletWebServerFactory::getAccessLogPrefix);
+    }
 
 }
