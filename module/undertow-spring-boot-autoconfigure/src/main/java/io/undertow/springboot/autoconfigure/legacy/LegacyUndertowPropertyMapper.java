@@ -47,110 +47,110 @@ import org.springframework.core.env.SystemEnvironmentPropertySource;
  */
 public class LegacyUndertowPropertyMapper implements EnvironmentPostProcessor {
 
-	static final String REMAPPED_SOURCE_NAME = "legacyUndertowProperties";
+    static final String REMAPPED_SOURCE_NAME = "legacyUndertowProperties";
 
-	static final String REMAPPED_ENV_SOURCE_NAME = "legacyUndertowEnvProperties";
+    static final String REMAPPED_ENV_SOURCE_NAME = "legacyUndertowEnvProperties";
 
-	static final String REPORT_SOURCE_NAME = "legacyUndertowReport";
+    static final String REPORT_SOURCE_NAME = "legacyUndertowReport";
 
-	private static final Set<String> EXCLUDED_DOT_KEYS = Set.of("server.undertow.buffers-per-region");
+    private static final Set<String> EXCLUDED_DOT_KEYS = Set.of("server.undertow.buffers-per-region");
 
-	private static final PrefixMapping[] DOT_MAPPINGS = {
-			new PrefixMapping("server.undertow.", "undertow.server."),
-			new PrefixMapping("management.server.undertow.", "undertow.management.")
-	};
+    private static final PrefixMapping[] DOT_MAPPINGS = {
+            new PrefixMapping("server.undertow.", "undertow.server."),
+            new PrefixMapping("management.server.undertow.", "undertow.management.")
+    };
 
-	private static final PrefixMapping[] ENV_MAPPINGS = {
-			new PrefixMapping("SERVER_UNDERTOW_", "UNDERTOW_SERVER_"),
-			new PrefixMapping("MANAGEMENT_SERVER_UNDERTOW_", "UNDERTOW_MANAGEMENT_")
-	};
+    private static final PrefixMapping[] ENV_MAPPINGS = {
+            new PrefixMapping("SERVER_UNDERTOW_", "UNDERTOW_SERVER_"),
+            new PrefixMapping("MANAGEMENT_SERVER_UNDERTOW_", "UNDERTOW_MANAGEMENT_")
+    };
 
-	@Override
-	public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
-		Map<String, Object> remapped = new LinkedHashMap<>();
-		Map<String, Object> remappedEnv = new LinkedHashMap<>();
-		List<MappedKey> mappedKeys = new ArrayList<>();
-		List<ShadowedKey> shadowedKeys = new ArrayList<>();
+    @Override
+    public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
+        Map<String, Object> remapped = new LinkedHashMap<>();
+        Map<String, Object> remappedEnv = new LinkedHashMap<>();
+        List<MappedKey> mappedKeys = new ArrayList<>();
+        List<ShadowedKey> shadowedKeys = new ArrayList<>();
 
-		MutablePropertySources propertySources = environment.getPropertySources();
-		for (PropertySource<?> source : propertySources) {
-			if (!(source instanceof EnumerablePropertySource<?> enumerable)) {
-				continue;
-			}
-			boolean isEnvSource = source instanceof SystemEnvironmentPropertySource;
-			PrefixMapping[] mappings = isEnvSource ? ENV_MAPPINGS : DOT_MAPPINGS;
-			Map<String, Object> targetMap = isEnvSource ? remappedEnv : remapped;
+        MutablePropertySources propertySources = environment.getPropertySources();
+        for (PropertySource<?> source : propertySources) {
+            if (!(source instanceof EnumerablePropertySource<?> enumerable)) {
+                continue;
+            }
+            boolean isEnvSource = source instanceof SystemEnvironmentPropertySource;
+            PrefixMapping[] mappings = isEnvSource ? ENV_MAPPINGS : DOT_MAPPINGS;
+            Map<String, Object> targetMap = isEnvSource ? remappedEnv : remapped;
 
-			for (String name : enumerable.getPropertyNames()) {
-				for (PrefixMapping mapping : mappings) {
-					if (!name.startsWith(mapping.oldPrefix())) {
-						continue;
-					}
-					if (!isEnvSource && EXCLUDED_DOT_KEYS.contains(name)) {
-						break;
-					}
-					String newKey = mapping.newPrefix() + name.substring(mapping.oldPrefix().length());
-					if (environment.containsProperty(newKey)) {
-						shadowedKeys.add(new ShadowedKey(name, newKey));
-					}
-					else {
-						targetMap.putIfAbsent(newKey, enumerable.getProperty(name));
-						mappedKeys.add(new MappedKey(name, newKey));
-					}
-					break;
-				}
-			}
-		}
+            for (String name : enumerable.getPropertyNames()) {
+                for (PrefixMapping mapping : mappings) {
+                    if (!name.startsWith(mapping.oldPrefix())) {
+                        continue;
+                    }
+                    if (!isEnvSource && EXCLUDED_DOT_KEYS.contains(name)) {
+                        break;
+                    }
+                    String newKey = mapping.newPrefix() + name.substring(mapping.oldPrefix().length());
+                    if (environment.containsProperty(newKey)) {
+                        shadowedKeys.add(new ShadowedKey(name, newKey));
+                    }
+                    else {
+                        targetMap.putIfAbsent(newKey, enumerable.getProperty(name));
+                        mappedKeys.add(new MappedKey(name, newKey));
+                    }
+                    break;
+                }
+            }
+        }
 
-		if (!remapped.isEmpty()) {
-			propertySources.addLast(new MapPropertySource(REMAPPED_SOURCE_NAME, remapped));
-		}
-		if (!remappedEnv.isEmpty()) {
-			propertySources.addLast(
-					new SystemEnvironmentPropertySource(REMAPPED_ENV_SOURCE_NAME, remappedEnv));
-		}
+        if (!remapped.isEmpty()) {
+            propertySources.addLast(new MapPropertySource(REMAPPED_SOURCE_NAME, remapped));
+        }
+        if (!remappedEnv.isEmpty()) {
+            propertySources.addLast(
+                    new SystemEnvironmentPropertySource(REMAPPED_ENV_SOURCE_NAME, remappedEnv));
+        }
 
-		propertySources.addLast(new ReportPropertySource(REPORT_SOURCE_NAME, mappedKeys, shadowedKeys));
-	}
+        propertySources.addLast(new ReportPropertySource(REPORT_SOURCE_NAME, mappedKeys, shadowedKeys));
+    }
 
-	private record PrefixMapping(String oldPrefix, String newPrefix) {
-	}
+    private record PrefixMapping(String oldPrefix, String newPrefix) {
+    }
 
-	record MappedKey(String oldKey, String newKey) {
-	}
+    record MappedKey(String oldKey, String newKey) {
+    }
 
-	record ShadowedKey(String oldKey, String newKey) {
-	}
+    record ShadowedKey(String oldKey, String newKey) {
+    }
 
-	/**
-	 * {@link PropertySource} used only as a data carrier for the mapping report.
-	 * It never resolves actual configuration properties.
-	 */
-	static class ReportPropertySource extends PropertySource<Object> {
+    /**
+     * {@link PropertySource} used only as a data carrier for the mapping report.
+     * It never resolves actual configuration properties.
+     */
+    static class ReportPropertySource extends PropertySource<Object> {
 
-		private final List<MappedKey> mappedKeys;
+        private final List<MappedKey> mappedKeys;
 
-		private final List<ShadowedKey> shadowedKeys;
+        private final List<ShadowedKey> shadowedKeys;
 
-		ReportPropertySource(String name, List<MappedKey> mapped, List<ShadowedKey> shadowed) {
-			super(name);
-			this.mappedKeys = List.copyOf(mapped);
-			this.shadowedKeys = List.copyOf(shadowed);
-		}
+        ReportPropertySource(String name, List<MappedKey> mapped, List<ShadowedKey> shadowed) {
+            super(name);
+            this.mappedKeys = List.copyOf(mapped);
+            this.shadowedKeys = List.copyOf(shadowed);
+        }
 
-		@Override
-		public Object getProperty(String name) {
-			return null;
-		}
+        @Override
+        public Object getProperty(String name) {
+            return null;
+        }
 
-		List<MappedKey> getMappedKeys() {
-			return this.mappedKeys;
-		}
+        List<MappedKey> getMappedKeys() {
+            return this.mappedKeys;
+        }
 
-		List<ShadowedKey> getShadowedKeys() {
-			return this.shadowedKeys;
-		}
+        List<ShadowedKey> getShadowedKeys() {
+            return this.shadowedKeys;
+        }
 
-	}
+    }
 
 }

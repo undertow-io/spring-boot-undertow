@@ -42,114 +42,114 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class LegacyPropertyMetadataConsistencyTest {
 
-	private static final String OLD_SERVER_PREFIX = "server.undertow";
+    private static final String OLD_SERVER_PREFIX = "server.undertow";
 
-	private static final String NEW_SERVER_PREFIX = "undertow.server";
+    private static final String NEW_SERVER_PREFIX = "undertow.server";
 
-	private static final String OLD_MANAGEMENT_PREFIX = "management.server.undertow";
+    private static final String OLD_MANAGEMENT_PREFIX = "management.server.undertow";
 
-	private static final String NEW_MANAGEMENT_PREFIX = "undertow.management";
+    private static final String NEW_MANAGEMENT_PREFIX = "undertow.management";
 
-	@Test
-	void everyServerPropertyHasDeprecatedMetadataEntry() throws Exception {
-		Map<String, String> deprecatedEntries = loadDeprecatedEntries();
-		List<String> propertyKeys = discoverPropertyKeys(UndertowServerProperties.class, NEW_SERVER_PREFIX, "");
-		List<String> missing = new ArrayList<>();
-		for (String newKey : propertyKeys) {
-			String oldKey = OLD_SERVER_PREFIX + newKey.substring(NEW_SERVER_PREFIX.length());
-			if (!deprecatedEntries.containsKey(oldKey)) {
-				missing.add(oldKey + " -> " + newKey);
-			}
-			else {
-				assertThat(deprecatedEntries.get(oldKey))
-						.as("replacement for deprecated key '%s'", oldKey)
-						.isEqualTo(newKey);
-			}
-		}
-		assertThat(missing)
-				.as("Properties missing deprecated metadata entries")
-				.isEmpty();
-	}
+    @Test
+    void everyServerPropertyHasDeprecatedMetadataEntry() throws Exception {
+        Map<String, String> deprecatedEntries = loadDeprecatedEntries();
+        List<String> propertyKeys = discoverPropertyKeys(UndertowServerProperties.class, NEW_SERVER_PREFIX, "");
+        List<String> missing = new ArrayList<>();
+        for (String newKey : propertyKeys) {
+            String oldKey = OLD_SERVER_PREFIX + newKey.substring(NEW_SERVER_PREFIX.length());
+            if (!deprecatedEntries.containsKey(oldKey)) {
+                missing.add(oldKey + " -> " + newKey);
+            }
+            else {
+                assertThat(deprecatedEntries.get(oldKey))
+                        .as("replacement for deprecated key '%s'", oldKey)
+                        .isEqualTo(newKey);
+            }
+        }
+        assertThat(missing)
+                .as("Properties missing deprecated metadata entries")
+                .isEmpty();
+    }
 
-	@Test
-	void everyManagementPropertyHasDeprecatedMetadataEntry() throws Exception {
-		Map<String, String> deprecatedEntries = loadDeprecatedEntries();
-		List<String> propertyKeys = discoverPropertyKeys(
-				UndertowManagementServerProperties.class, NEW_MANAGEMENT_PREFIX, "");
-		List<String> missing = new ArrayList<>();
-		for (String newKey : propertyKeys) {
-			String oldKey = OLD_MANAGEMENT_PREFIX + newKey.substring(NEW_MANAGEMENT_PREFIX.length());
-			if (!deprecatedEntries.containsKey(oldKey)) {
-				missing.add(oldKey + " -> " + newKey);
-			}
-			else {
-				assertThat(deprecatedEntries.get(oldKey))
-						.as("replacement for deprecated key '%s'", oldKey)
-						.isEqualTo(newKey);
-			}
-		}
-		assertThat(missing)
-				.as("Properties missing deprecated metadata entries")
-				.isEmpty();
-	}
+    @Test
+    void everyManagementPropertyHasDeprecatedMetadataEntry() throws Exception {
+        Map<String, String> deprecatedEntries = loadDeprecatedEntries();
+        List<String> propertyKeys = discoverPropertyKeys(
+                UndertowManagementServerProperties.class, NEW_MANAGEMENT_PREFIX, "");
+        List<String> missing = new ArrayList<>();
+        for (String newKey : propertyKeys) {
+            String oldKey = OLD_MANAGEMENT_PREFIX + newKey.substring(NEW_MANAGEMENT_PREFIX.length());
+            if (!deprecatedEntries.containsKey(oldKey)) {
+                missing.add(oldKey + " -> " + newKey);
+            }
+            else {
+                assertThat(deprecatedEntries.get(oldKey))
+                        .as("replacement for deprecated key '%s'", oldKey)
+                        .isEqualTo(newKey);
+            }
+        }
+        assertThat(missing)
+                .as("Properties missing deprecated metadata entries")
+                .isEmpty();
+    }
 
-	private Map<String, String> loadDeprecatedEntries() throws Exception {
-		Map<String, String> result = new LinkedHashMap<>();
-		try (InputStream is = getClass().getResourceAsStream(
-				"/META-INF/additional-spring-configuration-metadata.json")) {
-			assertThat(is).as("additional-spring-configuration-metadata.json").isNotNull();
-			JsonNode root = new ObjectMapper().readTree(is);
-			for (JsonNode prop : root.get("properties")) {
-				JsonNode deprecation = prop.get("deprecation");
-				if (deprecation != null && deprecation.has("replacement")) {
-					result.put(prop.get("name").asText(), deprecation.get("replacement").asText());
-				}
-			}
-		}
-		return result;
-	}
+    private Map<String, String> loadDeprecatedEntries() throws Exception {
+        Map<String, String> result = new LinkedHashMap<>();
+        try (InputStream is = getClass().getResourceAsStream(
+                "/META-INF/additional-spring-configuration-metadata.json")) {
+            assertThat(is).as("additional-spring-configuration-metadata.json").isNotNull();
+            JsonNode root = new ObjectMapper().readTree(is);
+            for (JsonNode prop : root.get("properties")) {
+                JsonNode deprecation = prop.get("deprecation");
+                if (deprecation != null && deprecation.has("replacement")) {
+                    result.put(prop.get("name").asText(), deprecation.get("replacement").asText());
+                }
+            }
+        }
+        return result;
+    }
 
-	private List<String> discoverPropertyKeys(Class<?> propertiesClass, String prefix, String path) {
-		List<String> keys = new ArrayList<>();
-		for (Field field : propertiesClass.getDeclaredFields()) {
-			if (java.lang.reflect.Modifier.isStatic(field.getModifiers())) {
-				continue;
-			}
-			String kebab = camelToKebab(field.getName());
-			String fullPath = path.isEmpty() ? prefix + "." + kebab : path + "." + kebab;
-			if (isNestedProperties(field)) {
-				keys.addAll(discoverPropertyKeys(field.getType(), prefix, fullPath));
-			}
-			else {
-				keys.add(fullPath);
-			}
-		}
-		return keys;
-	}
+    private List<String> discoverPropertyKeys(Class<?> propertiesClass, String prefix, String path) {
+        List<String> keys = new ArrayList<>();
+        for (Field field : propertiesClass.getDeclaredFields()) {
+            if (java.lang.reflect.Modifier.isStatic(field.getModifiers())) {
+                continue;
+            }
+            String kebab = camelToKebab(field.getName());
+            String fullPath = path.isEmpty() ? prefix + "." + kebab : path + "." + kebab;
+            if (isNestedProperties(field)) {
+                keys.addAll(discoverPropertyKeys(field.getType(), prefix, fullPath));
+            }
+            else {
+                keys.add(fullPath);
+            }
+        }
+        return keys;
+    }
 
-	private boolean isNestedProperties(Field field) {
-		Class<?> type = field.getType();
-		return type.getDeclaringClass() != null
-				&& (type.getDeclaringClass().isAnnotationPresent(ConfigurationProperties.class)
-						|| type.getEnclosingClass() != null
-								&& type.getEnclosingClass().isAnnotationPresent(ConfigurationProperties.class));
-	}
+    private boolean isNestedProperties(Field field) {
+        Class<?> type = field.getType();
+        return type.getDeclaringClass() != null
+                && (type.getDeclaringClass().isAnnotationPresent(ConfigurationProperties.class)
+                        || type.getEnclosingClass() != null
+                                && type.getEnclosingClass().isAnnotationPresent(ConfigurationProperties.class));
+    }
 
-	private String camelToKebab(String name) {
-		StringBuilder result = new StringBuilder();
-		for (int i = 0; i < name.length(); i++) {
-			char c = name.charAt(i);
-			if (Character.isUpperCase(c)) {
-				if (i > 0) {
-					result.append('-');
-				}
-				result.append(Character.toLowerCase(c));
-			}
-			else {
-				result.append(c);
-			}
-		}
-		return result.toString();
-	}
+    private String camelToKebab(String name) {
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < name.length(); i++) {
+            char c = name.charAt(i);
+            if (Character.isUpperCase(c)) {
+                if (i > 0) {
+                    result.append('-');
+                }
+                result.append(Character.toLowerCase(c));
+            }
+            else {
+                result.append(c);
+            }
+        }
+        return result.toString();
+    }
 
 }
