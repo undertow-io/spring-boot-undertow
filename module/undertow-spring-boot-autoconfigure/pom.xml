@@ -149,6 +149,9 @@
     </dependency>
   </dependencies>
 
+  <!-- Test compilation and execution are skipped by default because the TCK
+       depends on spring-boot-web-server test-fixtures which are not published
+       to Maven Central. Activate with -Ptck after building Spring Boot locally. -->
   <build>
     <pluginManagement>
       <plugins>
