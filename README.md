@@ -87,14 +87,20 @@ mvn clean install
 
 ## Tests
 
-This project uses the Spring Boot Web Server TCK (`spring-boot-web-server` test-fixtures) to validate compatibility. The test-fixtures are not published to Maven Central, so you need to build Spring Boot locally first:
+This project uses the Spring Boot Web Server TCK (`spring-boot-web-server` test-fixtures) to validate compatibility. The test-fixtures and `spring-boot-test-support` are not published to Maven Central, so you need to build them from Spring Boot (which requires JDK 25 to build) and install them into your local Maven repo first:
 
 ```bash
-# 1. Clone and build Spring Boot to install test-fixtures to your local Maven repo
+# 1. Build the test fixtures from the matching Spring Boot tag and install them into your local Maven repo
 git clone https://github.com/spring-projects/spring-boot.git
 cd spring-boot
 git checkout v4.1.1
-./gradlew publishToMavenLocal
+./gradlew :module:spring-boot-web-server:testFixturesJar :test-support:spring-boot-test-support:jar
+mvn install:install-file -Dfile=module/spring-boot-web-server/build/libs/spring-boot-web-server-4.1.1-test-fixtures.jar \
+  -DgroupId=org.springframework.boot -DartifactId=spring-boot-web-server -Dversion=4.1.1 \
+  -Dclassifier=test-fixtures -Dpackaging=jar -DgeneratePom=false
+mvn install:install-file -Dfile=test-support/spring-boot-test-support/build/libs/spring-boot-test-support-4.1.1.jar \
+  -DgroupId=org.springframework.boot -DartifactId=spring-boot-test-support -Dversion=4.1.1 \
+  -Dpackaging=jar -DgeneratePom=true
 
 # 2. Run the TCK tests with the 'tck' profile
 cd /path/to/spring-boot-undertow
