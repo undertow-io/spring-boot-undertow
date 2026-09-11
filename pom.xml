@@ -47,8 +47,8 @@
     <maven.compiler.release>17</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-    <version.org.springframework.boot>4.1.0</version.org.springframework.boot>
-    <version.io.undertow.ee>2.0.1.Final</version.io.undertow.ee>
+    <version.org.springframework.boot>4.1.1</version.org.springframework.boot>
+    <version.io.undertow.ee>2.0.2.Final</version.io.undertow.ee>
 
     <!-- Checkstyle and SpotBugs -->
     <version.io.undertow.build.checkstyle-config>2.0.0.Final</version.io.undertow.build.checkstyle-config>

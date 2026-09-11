@@ -6,7 +6,7 @@ Community-maintained Undertow starter for Spring Boot 4.x.
 
 Undertow support was [removed from Spring Boot 4.0](https://github.com/spring-projects/spring-boot/issues/46917) because no Servlet 6.1-compatible Undertow release existed at the time. The Spring Boot team has [explicitly declined](https://github.com/spring-projects/spring-boot/issues/50381) re-adding it upstream, recommending a community-maintained third-party starter instead.
 
-This project fills that gap using [Undertow EE](https://github.com/undertow-io/undertow-ee) 2.0.1.Final (which implements Jakarta Servlet 6.1) and the modularised Undertow support from Spring Boot 4.0.0-M1 as a starting point.
+This project fills that gap using [Undertow EE](https://github.com/undertow-io/undertow-ee) 2.0.2.Final (which implements Jakarta Servlet 6.1) and the modularised Undertow support from Spring Boot 4.0.0-M1 as a starting point.
 
 ## Usage
 
@@ -93,7 +93,7 @@ This project uses the Spring Boot Web Server TCK (`spring-boot-web-server` test-
 # 1. Clone and build Spring Boot to install test-fixtures to your local Maven repo
 git clone https://github.com/spring-projects/spring-boot.git
 cd spring-boot
-git checkout v4.1.0
+git checkout v4.1.1
 ./gradlew publishToMavenLocal
 
 # 2. Run the TCK tests with the 'tck' profile
@@ -108,7 +108,7 @@ mvn test -pl module/undertow-spring-boot-autoconfigure -Ptck
 
 - Java 17+
 - Maven 3.6+
-- Spring Boot 4.1.0+
+- Spring Boot 4.1.1+
 
 ## License
 
