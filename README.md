@@ -8,19 +8,6 @@ Undertow support was [removed from Spring Boot 4.0](https://github.com/spring-pr
 
 This project fills that gap using [Undertow EE](https://github.com/undertow-io/undertow-ee) 2.0.1.Final (which implements Jakarta Servlet 6.1) and the modularised Undertow support from Spring Boot 4.0.0-M1 as a starting point.
 
-## Project Structure
-
-```
-spring-boot-undertow/
-├── pom.xml                                       <- parent POM
-├── module/
-│   └── undertow-spring-boot-autoconfigure/       <- core Undertow integration
-│       └── pom.xml
-└── starter/
-    └── undertow-spring-boot-starter/             <- Undertow starter
-        └── pom.xml
-```
-
 ## Usage
 
 Add the starter to your Spring Boot 4 project:
@@ -113,8 +100,6 @@ git checkout v4.1.0
 cd /path/to/spring-boot-undertow
 mvn test -pl module/undertow-spring-boot-autoconfigure -Ptck
 ```
-
-**Test results:** 223 tests, 215 pass, 6 skipped, 8 known incompatibilities:
 
 - **5 log-message pattern tests** (inherited from TCK): The abstract base class uses a `(Jetty|Tomcat)` regex that cannot be modified. Equivalent Undertow-specific log-message tests are provided as `undertowStartedLogMessage*`.
 - **3 reactive stop/graceful-shutdown tests** (inherited from TCK): `Undertow.stop()` tears down the XNIO worker immediately. The old native `UndertowHttpHandlerAdapter` (removed from Spring Framework 7.0) kept worker threads busy for the request duration; the Servlet bridge dispatches to the servlet engine's async executor instead. Servlet-based graceful shutdown works correctly.
