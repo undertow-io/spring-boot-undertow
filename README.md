@@ -48,6 +48,38 @@ Make sure to exclude the default Tomcat starter if you are using `spring-boot-st
 </dependency>
 ```
 
+## Configuration
+
+The canonical configuration prefix is `undertow.server.*` for the main web server and `undertow.management.*` for the management/actuator server.
+
+```yaml
+# application.yml
+undertow:
+  server:
+    threads:
+      io: 4
+      worker: 32
+    buffer-size: 16KB
+    direct-buffers: true
+    max-http-post-size: 4MB
+    accesslog:
+      enabled: true
+      dir: /var/log/undertow
+      pattern: combined
+    options:
+      server:
+        ALWAYS_SET_KEEP_ALIVE: "true"
+  management:
+    accesslog:
+      prefix: management_
+```
+
+### Deprecated prefixes
+
+The old `server.undertow.*` and `management.server.undertow.*` prefixes are **deprecated** but still work. They are automatically mapped to the new prefixes at startup, and a WARN is logged listing every deprecated key that was set. If both old and new keys are set for the same property, the new key takes precedence.
+
+These deprecated prefixes will be removed in the next feature release. See [MIGRATION.md](MIGRATION.md) for the full old-to-new key table.
+
 ### WebFlux (Reactive) Support
 
 This starter also works with `spring-boot-starter-webflux`. Reactive HTTP handling goes through the Servlet bridge (`ServletHttpHandlerAdapter`), the same approach Spring Boot uses for Jetty reactive support.
