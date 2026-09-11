@@ -18,7 +18,9 @@ package io.undertow.springboot.autoconfigure.legacy;
 
 import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +51,8 @@ class LegacyPropertyMetadataConsistencyTest {
     private static final String OLD_MANAGEMENT_PREFIX = "management.server.undertow";
 
     private static final String NEW_MANAGEMENT_PREFIX = "undertow.management";
+
+    private static final String METADATA_RESOURCE = "META-INF/additional-spring-configuration-metadata.json";
 
     @Test
     void everyServerPropertyHasDeprecatedMetadataEntry() throws Exception {
@@ -95,9 +99,7 @@ class LegacyPropertyMetadataConsistencyTest {
 
     private Map<String, String> loadDeprecatedEntries() throws Exception {
         Map<String, String> result = new LinkedHashMap<>();
-        try (InputStream is = getClass().getResourceAsStream(
-                "/META-INF/additional-spring-configuration-metadata.json")) {
-            assertThat(is).as("additional-spring-configuration-metadata.json").isNotNull();
+        try (InputStream is = moduleMetadata().openStream()) {
             JsonNode root = new ObjectMapper().readTree(is);
             for (JsonNode prop : root.get("properties")) {
                 JsonNode deprecation = prop.get("deprecation");
@@ -107,6 +109,24 @@ class LegacyPropertyMetadataConsistencyTest {
             }
         }
         return result;
+    }
+
+    /**
+     * Returns this module's metadata file. Spring Boot's jars contain a file with the same
+     * name, and the JDK-specific surefire profiles inherited from jboss-parent put this
+     * module's classes last on the test classpath, so the first match is not ours.
+     */
+    private URL moduleMetadata() throws Exception {
+        String moduleLocation = UndertowServerProperties.class.getProtectionDomain()
+                .getCodeSource().getLocation().toString();
+        Enumeration<URL> candidates = getClass().getClassLoader().getResources(METADATA_RESOURCE);
+        while (candidates.hasMoreElements()) {
+            URL candidate = candidates.nextElement();
+            if (candidate.toString().contains(moduleLocation)) {
+                return candidate;
+            }
+        }
+        throw new AssertionError(METADATA_RESOURCE + " not found in " + moduleLocation);
     }
 
     private List<String> discoverPropertyKeys(Class<?> propertiesClass, String prefix, String path) {
