@@ -19,35 +19,48 @@
   </licenses>
   <dependencies>
     <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter</artifactId>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
       <groupId>io.undertow</groupId>
       <artifactId>undertow-spring-boot-autoconfigure</artifactId>
       <version>${project.version}</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-web-server</artifactId>
-      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>io.undertow.ee</groupId>
       <artifactId>undertow-servlet</artifactId>
-      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>io.undertow.ee</groupId>
       <artifactId>undertow-websockets</artifactId>
-      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.tomcat.embed</groupId>
       <artifactId>tomcat-embed-el</artifactId>
-      <scope>compile</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-tomcat</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>

@@ -149,6 +149,9 @@
     </dependency>
   </dependencies>
 
+  <!-- Test compilation and execution are skipped by default because the TCK
+       depends on spring-boot-web-server test-fixtures which are not published
+       to Maven Central. Activate with -Ptck after building Spring Boot locally. -->
   <build>
     <pluginManagement>
       <plugins>
@@ -180,14 +183,14 @@
         <dependency>
           <groupId>org.springframework.boot</groupId>
           <artifactId>spring-boot-web-server</artifactId>
-          <version>${spring-boot.version}</version>
+          <version>${version.org.springframework.boot}</version>
           <classifier>test-fixtures</classifier>
           <scope>test</scope>
         </dependency>
         <dependency>
           <groupId>org.springframework.boot</groupId>
           <artifactId>spring-boot-test-support</artifactId>
-          <version>${spring-boot.version}</version>
+          <version>${version.org.springframework.boot}</version>
           <scope>test</scope>
         </dependency>
         <dependency>
