@@ -37,83 +37,83 @@ import org.xnio.XnioWorker;
  */
 class AccessLogHttpHandlerFactory implements HttpHandlerFactory {
 
-	private final File directory;
+    private final File directory;
 
-	private final @Nullable String pattern;
+    private final @Nullable String pattern;
 
-	private final @Nullable String prefix;
+    private final @Nullable String prefix;
 
-	private final @Nullable String suffix;
+    private final @Nullable String suffix;
 
-	private final boolean rotate;
+    private final boolean rotate;
 
-	AccessLogHttpHandlerFactory(File directory, @Nullable String pattern, @Nullable String prefix,
-			@Nullable String suffix, boolean rotate) {
-		this.directory = directory;
-		this.pattern = pattern;
-		this.prefix = prefix;
-		this.suffix = suffix;
-		this.rotate = rotate;
-	}
+    AccessLogHttpHandlerFactory(File directory, @Nullable String pattern, @Nullable String prefix,
+            @Nullable String suffix, boolean rotate) {
+        this.directory = directory;
+        this.pattern = pattern;
+        this.prefix = prefix;
+        this.suffix = suffix;
+        this.rotate = rotate;
+    }
 
-	@Override
-	public HttpHandler getHandler(@Nullable HttpHandler next) {
-		try {
-			createAccessLogDirectoryIfNecessary();
-			XnioWorker worker = createWorker();
-			String baseName = (this.prefix != null) ? this.prefix : "access_log.";
-			String formatString = (this.pattern != null) ? this.pattern : "common";
-			return new ClosableAccessLogHandler(next, worker,
-					new DefaultAccessLogReceiver(worker, this.directory, baseName, this.suffix, this.rotate),
-					formatString);
-		}
-		catch (IOException ex) {
-			throw new IllegalStateException("Failed to create AccessLogHandler", ex);
-		}
-	}
+    @Override
+    public HttpHandler getHandler(@Nullable HttpHandler next) {
+        try {
+            createAccessLogDirectoryIfNecessary();
+            XnioWorker worker = createWorker();
+            String baseName = (this.prefix != null) ? this.prefix : "access_log.";
+            String formatString = (this.pattern != null) ? this.pattern : "common";
+            return new ClosableAccessLogHandler(next, worker,
+                    new DefaultAccessLogReceiver(worker, this.directory, baseName, this.suffix, this.rotate),
+                    formatString);
+        }
+        catch (IOException ex) {
+            throw new IllegalStateException("Failed to create AccessLogHandler", ex);
+        }
+    }
 
-	private void createAccessLogDirectoryIfNecessary() {
-		if (!this.directory.isDirectory() && !this.directory.mkdirs()) {
-			throw new IllegalStateException("Failed to create access log directory '" + this.directory + "'");
-		}
-	}
+    private void createAccessLogDirectoryIfNecessary() {
+        if (!this.directory.isDirectory() && !this.directory.mkdirs()) {
+            throw new IllegalStateException("Failed to create access log directory '" + this.directory + "'");
+        }
+    }
 
-	private XnioWorker createWorker() throws IOException {
-		Xnio xnio = Xnio.getInstance(Undertow.class.getClassLoader());
-		return xnio.createWorker(OptionMap.builder().set(Options.THREAD_DAEMON, true).getMap());
-	}
+    private XnioWorker createWorker() throws IOException {
+        Xnio xnio = Xnio.getInstance(Undertow.class.getClassLoader());
+        return xnio.createWorker(OptionMap.builder().set(Options.THREAD_DAEMON, true).getMap());
+    }
 
-	/**
-	 * {@link Closeable} variant of {@link AccessLogHandler}.
-	 */
-	private static class ClosableAccessLogHandler extends AccessLogHandler implements Closeable {
+    /**
+     * {@link Closeable} variant of {@link AccessLogHandler}.
+     */
+    private static class ClosableAccessLogHandler extends AccessLogHandler implements Closeable {
 
-		private final DefaultAccessLogReceiver accessLogReceiver;
+        private final DefaultAccessLogReceiver accessLogReceiver;
 
-		private final XnioWorker worker;
+        private final XnioWorker worker;
 
-		ClosableAccessLogHandler(@Nullable HttpHandler next, XnioWorker worker,
-				DefaultAccessLogReceiver accessLogReceiver, String formatString) {
-			super(next, accessLogReceiver, formatString, Undertow.class.getClassLoader());
-			this.worker = worker;
-			this.accessLogReceiver = accessLogReceiver;
-		}
+        ClosableAccessLogHandler(@Nullable HttpHandler next, XnioWorker worker,
+                DefaultAccessLogReceiver accessLogReceiver, String formatString) {
+            super(next, accessLogReceiver, formatString, Undertow.class.getClassLoader());
+            this.worker = worker;
+            this.accessLogReceiver = accessLogReceiver;
+        }
 
-		@Override
-		public void close() throws IOException {
-			try {
-				this.accessLogReceiver.close();
-				this.worker.shutdown();
-				this.worker.awaitTermination(30, TimeUnit.SECONDS);
-			}
-			catch (IOException ex) {
-				throw new RuntimeException(ex);
-			}
-			catch (InterruptedException ex) {
-				Thread.currentThread().interrupt();
-			}
-		}
+        @Override
+        public void close() throws IOException {
+            try {
+                this.accessLogReceiver.close();
+                this.worker.shutdown();
+                this.worker.awaitTermination(30, TimeUnit.SECONDS);
+            }
+            catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+            catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+        }
 
-	}
+    }
 
 }

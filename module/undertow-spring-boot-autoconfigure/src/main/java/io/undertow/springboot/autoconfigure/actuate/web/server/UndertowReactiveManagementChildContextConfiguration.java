@@ -43,16 +43,16 @@ import org.springframework.context.annotation.Bean;
 @ManagementContextConfiguration(value = ManagementContextType.CHILD, proxyBeanMethods = false)
 class UndertowReactiveManagementChildContextConfiguration {
 
-	@Bean
-	static ManagementContextFactory reactiveWebChildContextFactory() {
-		return new ManagementContextFactory(WebApplicationType.REACTIVE, ReactiveWebServerFactory.class,
-				UndertowReactiveWebServerAutoConfiguration.class);
-	}
+    @Bean
+    static ManagementContextFactory reactiveWebChildContextFactory() {
+        return new ManagementContextFactory(WebApplicationType.REACTIVE, ReactiveWebServerFactory.class,
+                UndertowReactiveWebServerAutoConfiguration.class);
+    }
 
-	@Bean
-	UndertowAccessLogCustomizer<UndertowReactiveWebServerFactory> undertowManagementAccessLogCustomizer(
-			UndertowManagementServerProperties properties) {
-		return new UndertowAccessLogCustomizer<>(properties, UndertowReactiveWebServerFactory::getAccessLogPrefix);
-	}
+    @Bean
+    UndertowAccessLogCustomizer<UndertowReactiveWebServerFactory> undertowManagementAccessLogCustomizer(
+            UndertowManagementServerProperties properties) {
+        return new UndertowAccessLogCustomizer<>(properties, UndertowReactiveWebServerFactory::getAccessLogPrefix);
+    }
 
 }

@@ -28,18 +28,18 @@ import org.springframework.context.annotation.Configuration;
  */
 class UndertowServletWebServerMvcIntegrationTests extends AbstractServletWebServerMvcIntegrationTests {
 
-	protected UndertowServletWebServerMvcIntegrationTests() {
-		super(UndertowConfig.class);
-	}
+    protected UndertowServletWebServerMvcIntegrationTests() {
+        super(UndertowConfig.class);
+    }
 
-	@Configuration(proxyBeanMethods = false)
-	static class UndertowConfig {
+    @Configuration(proxyBeanMethods = false)
+    static class UndertowConfig {
 
-		@Bean
-		UndertowServletWebServerFactory webServerFactory() {
-			return new UndertowServletWebServerFactory(0);
-		}
+        @Bean
+        UndertowServletWebServerFactory webServerFactory() {
+            return new UndertowServletWebServerFactory(0);
+        }
 
-	}
+    }
 
 }

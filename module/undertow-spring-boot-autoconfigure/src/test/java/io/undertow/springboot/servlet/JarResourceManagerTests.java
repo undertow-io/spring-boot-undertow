@@ -45,58 +45,58 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class JarResourceManagerTests {
 
-	@TempDir
-	static File tempDir;
+    @TempDir
+    static File tempDir;
 
-	@ResourceManagersTest
-	void emptyPathIsHandledCorrectly(String filename, ResourceManager resourceManager) throws IOException {
-		Resource resource = resourceManager.getResource("");
-		assertThat(resource).isNotNull();
-		assertThat(resource.isDirectory()).isTrue();
-	}
+    @ResourceManagersTest
+    void emptyPathIsHandledCorrectly(String filename, ResourceManager resourceManager) throws IOException {
+        Resource resource = resourceManager.getResource("");
+        assertThat(resource).isNotNull();
+        assertThat(resource.isDirectory()).isTrue();
+    }
 
-	@ResourceManagersTest
-	void rootPathIsHandledCorrectly(String filename, ResourceManager resourceManager) throws IOException {
-		Resource resource = resourceManager.getResource("/");
-		assertThat(resource).isNotNull();
-		assertThat(resource.isDirectory()).isTrue();
-	}
+    @ResourceManagersTest
+    void rootPathIsHandledCorrectly(String filename, ResourceManager resourceManager) throws IOException {
+        Resource resource = resourceManager.getResource("/");
+        assertThat(resource).isNotNull();
+        assertThat(resource.isDirectory()).isTrue();
+    }
 
-	@ResourceManagersTest
-	void resourceIsFoundInJarFile(String filename, ResourceManager resourceManager) throws IOException {
-		Resource resource = resourceManager.getResource("/hello.txt");
-		assertThat(resource).isNotNull();
-		assertThat(resource.isDirectory()).isFalse();
-		assertThat(resource.getContentLength()).isEqualTo(5);
-	}
+    @ResourceManagersTest
+    void resourceIsFoundInJarFile(String filename, ResourceManager resourceManager) throws IOException {
+        Resource resource = resourceManager.getResource("/hello.txt");
+        assertThat(resource).isNotNull();
+        assertThat(resource.isDirectory()).isFalse();
+        assertThat(resource.getContentLength()).isEqualTo(5);
+    }
 
-	@ResourceManagersTest
-	void resourceIsFoundInJarFileWithoutLeadingSlash(String filename, ResourceManager resourceManager)
-			throws IOException {
-		Resource resource = resourceManager.getResource("hello.txt");
-		assertThat(resource).isNotNull();
-		assertThat(resource.isDirectory()).isFalse();
-		assertThat(resource.getContentLength()).isEqualTo(5);
-	}
+    @ResourceManagersTest
+    void resourceIsFoundInJarFileWithoutLeadingSlash(String filename, ResourceManager resourceManager)
+            throws IOException {
+        Resource resource = resourceManager.getResource("hello.txt");
+        assertThat(resource).isNotNull();
+        assertThat(resource.isDirectory()).isFalse();
+        assertThat(resource.getContentLength()).isEqualTo(5);
+    }
 
-	static List<Arguments> resourceManagers() throws IOException {
-		File jar = new File(tempDir, "test.jar");
-		try (JarOutputStream out = new JarOutputStream(new FileOutputStream(jar))) {
-			out.putNextEntry(new ZipEntry("hello.txt"));
-			out.write("hello".getBytes());
-		}
-		File troublesomeNameJar = new File(tempDir, "test##1.0.jar");
-		FileCopyUtils.copy(jar, troublesomeNameJar);
-		return Arrays.asList(Arguments.of(jar.getName(), new JarResourceManager(jar)),
-				Arguments.of(troublesomeNameJar.getName(), new JarResourceManager(troublesomeNameJar)));
-	}
+    static List<Arguments> resourceManagers() throws IOException {
+        File jar = new File(tempDir, "test.jar");
+        try (JarOutputStream out = new JarOutputStream(new FileOutputStream(jar))) {
+            out.putNextEntry(new ZipEntry("hello.txt"));
+            out.write("hello".getBytes());
+        }
+        File troublesomeNameJar = new File(tempDir, "test##1.0.jar");
+        FileCopyUtils.copy(jar, troublesomeNameJar);
+        return Arrays.asList(Arguments.of(jar.getName(), new JarResourceManager(jar)),
+                Arguments.of(troublesomeNameJar.getName(), new JarResourceManager(troublesomeNameJar)));
+    }
 
-	@ParameterizedTest(name = "[{index}] {0}")
-	@MethodSource("resourceManagers")
-	@Target(ElementType.METHOD)
-	@Retention(RetentionPolicy.RUNTIME)
-	private @interface ResourceManagersTest {
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("resourceManagers")
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    private @interface ResourceManagersTest {
 
-	}
+    }
 
 }

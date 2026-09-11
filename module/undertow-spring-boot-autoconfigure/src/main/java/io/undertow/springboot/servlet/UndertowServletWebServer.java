@@ -37,55 +37,55 @@ import org.springframework.util.StringUtils;
  */
 public class UndertowServletWebServer extends UndertowWebServer {
 
-	private final String contextPath;
+    private final String contextPath;
 
-	private final @Nullable DeploymentManager manager;
+    private final @Nullable DeploymentManager manager;
 
-	/**
-	 * Create a new {@link UndertowServletWebServer} instance.
-	 * @param builder the builder
-	 * @param httpHandlerFactories the handler factories
-	 * @param contextPath the root context path
-	 * @param autoStart if the server should be started
-	 * @since 4.0.0
-	 */
-	public UndertowServletWebServer(Builder builder, Iterable<HttpHandlerFactory> httpHandlerFactories,
-			String contextPath, boolean autoStart) {
-		super(builder, httpHandlerFactories, autoStart);
-		this.contextPath = contextPath;
-		this.manager = findManager(httpHandlerFactories);
-	}
+    /**
+     * Create a new {@link UndertowServletWebServer} instance.
+     * @param builder the builder
+     * @param httpHandlerFactories the handler factories
+     * @param contextPath the root context path
+     * @param autoStart if the server should be started
+     * @since 4.0.0
+     */
+    public UndertowServletWebServer(Builder builder, Iterable<HttpHandlerFactory> httpHandlerFactories,
+            String contextPath, boolean autoStart) {
+        super(builder, httpHandlerFactories, autoStart);
+        this.contextPath = contextPath;
+        this.manager = findManager(httpHandlerFactories);
+    }
 
-	private @Nullable DeploymentManager findManager(Iterable<HttpHandlerFactory> httpHandlerFactories) {
-		for (HttpHandlerFactory httpHandlerFactory : httpHandlerFactories) {
-			if (httpHandlerFactory instanceof DeploymentManagerHttpHandlerFactory deploymentManagerFactory) {
-				return deploymentManagerFactory.getDeploymentManager();
-			}
-		}
-		return null;
-	}
+    private @Nullable DeploymentManager findManager(Iterable<HttpHandlerFactory> httpHandlerFactories) {
+        for (HttpHandlerFactory httpHandlerFactory : httpHandlerFactories) {
+            if (httpHandlerFactory instanceof DeploymentManagerHttpHandlerFactory deploymentManagerFactory) {
+                return deploymentManagerFactory.getDeploymentManager();
+            }
+        }
+        return null;
+    }
 
-	@Override
-	protected @Nullable HttpHandler createHttpHandler() {
-		HttpHandler handler = super.createHttpHandler();
-		if (StringUtils.hasLength(this.contextPath)) {
-			handler = Handlers.path().addPrefixPath(this.contextPath, handler);
-		}
-		return handler;
-	}
+    @Override
+    protected @Nullable HttpHandler createHttpHandler() {
+        HttpHandler handler = super.createHttpHandler();
+        if (StringUtils.hasLength(this.contextPath)) {
+            handler = Handlers.path().addPrefixPath(this.contextPath, handler);
+        }
+        return handler;
+    }
 
-	@Override
-	protected String getStartedLogMessage() {
-		String contextPath = StringUtils.hasText(this.contextPath) ? this.contextPath : "/";
-		StringBuilder message = new StringBuilder(super.getStartedLogMessage());
-		message.append(" with context path '");
-		message.append(contextPath);
-		message.append("'");
-		return message.toString();
-	}
+    @Override
+    protected String getStartedLogMessage() {
+        String contextPath = StringUtils.hasText(this.contextPath) ? this.contextPath : "/";
+        StringBuilder message = new StringBuilder(super.getStartedLogMessage());
+        message.append(" with context path '");
+        message.append(contextPath);
+        message.append("'");
+        return message.toString();
+    }
 
-	public @Nullable DeploymentManager getDeploymentManager() {
-		return this.manager;
-	}
+    public @Nullable DeploymentManager getDeploymentManager() {
+        return this.manager;
+    }
 
 }

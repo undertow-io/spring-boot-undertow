@@ -34,63 +34,63 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class FileSessionPersistenceTests {
 
-	private File dir;
+    private File dir;
 
-	private FileSessionPersistence persistence;
+    private FileSessionPersistence persistence;
 
-	private final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+    private final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 
-	private final Date expiration = new Date(System.currentTimeMillis() + 10000);
+    private final Date expiration = new Date(System.currentTimeMillis() + 10000);
 
-	@BeforeEach
-	void setup(@TempDir File tempDir) {
-		this.dir = tempDir;
-		this.dir.mkdir();
-		this.persistence = new FileSessionPersistence(this.dir);
-	}
+    @BeforeEach
+    void setup(@TempDir File tempDir) {
+        this.dir = tempDir;
+        this.dir.mkdir();
+        this.persistence = new FileSessionPersistence(this.dir);
+    }
 
-	@Test
-	void loadsNullForMissingFile() {
-		Map<String, PersistentSession> attributes = this.persistence.loadSessionAttributes("test", this.classLoader);
-		assertThat(attributes).isNull();
-	}
+    @Test
+    void loadsNullForMissingFile() {
+        Map<String, PersistentSession> attributes = this.persistence.loadSessionAttributes("test", this.classLoader);
+        assertThat(attributes).isNull();
+    }
 
-	@Test
-	void persistAndLoad() {
-		Map<String, PersistentSession> sessionData = new LinkedHashMap<>();
-		Map<String, Object> data = new LinkedHashMap<>();
-		data.put("spring", "boot");
-		PersistentSession session = new PersistentSession(this.expiration, data);
-		sessionData.put("abc", session);
-		this.persistence.persistSessions("test", sessionData);
-		Map<String, PersistentSession> restored = this.persistence.loadSessionAttributes("test", this.classLoader);
-		assertThat(restored).isNotNull();
-		assertThat(restored.get("abc").getExpiration()).isEqualTo(this.expiration);
-		assertThat(restored.get("abc").getSessionData()).containsEntry("spring", "boot");
-	}
+    @Test
+    void persistAndLoad() {
+        Map<String, PersistentSession> sessionData = new LinkedHashMap<>();
+        Map<String, Object> data = new LinkedHashMap<>();
+        data.put("spring", "boot");
+        PersistentSession session = new PersistentSession(this.expiration, data);
+        sessionData.put("abc", session);
+        this.persistence.persistSessions("test", sessionData);
+        Map<String, PersistentSession> restored = this.persistence.loadSessionAttributes("test", this.classLoader);
+        assertThat(restored).isNotNull();
+        assertThat(restored.get("abc").getExpiration()).isEqualTo(this.expiration);
+        assertThat(restored.get("abc").getSessionData()).containsEntry("spring", "boot");
+    }
 
-	@Test
-	void dontRestoreExpired() {
-		Date expired = new Date(System.currentTimeMillis() - 1000);
-		Map<String, PersistentSession> sessionData = new LinkedHashMap<>();
-		Map<String, Object> data = new LinkedHashMap<>();
-		data.put("spring", "boot");
-		PersistentSession session = new PersistentSession(expired, data);
-		sessionData.put("abc", session);
-		this.persistence.persistSessions("test", sessionData);
-		Map<String, PersistentSession> restored = this.persistence.loadSessionAttributes("test", this.classLoader);
-		assertThat(restored).isNotNull();
-		assertThat(restored).doesNotContainKey("abc");
-	}
+    @Test
+    void dontRestoreExpired() {
+        Date expired = new Date(System.currentTimeMillis() - 1000);
+        Map<String, PersistentSession> sessionData = new LinkedHashMap<>();
+        Map<String, Object> data = new LinkedHashMap<>();
+        data.put("spring", "boot");
+        PersistentSession session = new PersistentSession(expired, data);
+        sessionData.put("abc", session);
+        this.persistence.persistSessions("test", sessionData);
+        Map<String, PersistentSession> restored = this.persistence.loadSessionAttributes("test", this.classLoader);
+        assertThat(restored).isNotNull();
+        assertThat(restored).doesNotContainKey("abc");
+    }
 
-	@Test
-	void deleteFileOnClear() {
-		File sessionFile = new File(this.dir, "test.session");
-		Map<String, PersistentSession> sessionData = new LinkedHashMap<>();
-		this.persistence.persistSessions("test", sessionData);
-		assertThat(sessionFile).exists();
-		this.persistence.clear("test");
-		assertThat(sessionFile).doesNotExist();
-	}
+    @Test
+    void deleteFileOnClear() {
+        File sessionFile = new File(this.dir, "test.session");
+        Map<String, PersistentSession> sessionData = new LinkedHashMap<>();
+        this.persistence.persistSessions("test", sessionData);
+        assertThat(sessionFile).exists();
+        this.persistence.clear("test");
+        assertThat(sessionFile).doesNotExist();
+    }
 
 }

@@ -15,14 +15,10 @@ package io.undertow.springboot.autoconfigure.metrics;
 
 import java.util.function.Supplier;
 
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
-
 import io.micrometer.core.instrument.FunctionCounter;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
-import io.micrometer.core.instrument.Tags;
 import io.micrometer.core.instrument.binder.BaseUnits;
 import io.micrometer.core.instrument.binder.MeterBinder;
 import io.undertow.server.session.SessionManager;

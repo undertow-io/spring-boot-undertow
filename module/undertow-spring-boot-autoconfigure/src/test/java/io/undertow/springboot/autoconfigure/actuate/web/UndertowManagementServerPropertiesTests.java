@@ -28,10 +28,10 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class UndertowManagementServerPropertiesTests {
 
-	@Test
-	void accessLogsArePrefixedByDefault() {
-		UndertowManagementServerProperties properties = new UndertowManagementServerProperties();
-		assertThat(properties.getAccesslog().getPrefix()).isEqualTo("management_");
-	}
+    @Test
+    void accessLogsArePrefixedByDefault() {
+        UndertowManagementServerProperties properties = new UndertowManagementServerProperties();
+        assertThat(properties.getAccesslog().getPrefix()).isEqualTo("management_");
+    }
 
 }

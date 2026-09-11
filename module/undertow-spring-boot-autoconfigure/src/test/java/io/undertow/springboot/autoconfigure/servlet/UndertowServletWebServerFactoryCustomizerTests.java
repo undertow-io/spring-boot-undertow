@@ -29,24 +29,24 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class UndertowServletWebServerFactoryCustomizerTests {
 
-	@Test
-	void eagerFilterInitCanBeDisabled() {
-		UndertowServletWebServerFactory factory = new UndertowServletWebServerFactory(0);
-		assertThat(factory.isEagerFilterInit()).isTrue();
-		UndertowServerProperties undertowProperties = new UndertowServerProperties();
-		undertowProperties.setEagerFilterInit(false);
-		new UndertowServletWebServerFactoryCustomizer(undertowProperties).customize(factory);
-		assertThat(factory.isEagerFilterInit()).isFalse();
-	}
+    @Test
+    void eagerFilterInitCanBeDisabled() {
+        UndertowServletWebServerFactory factory = new UndertowServletWebServerFactory(0);
+        assertThat(factory.isEagerFilterInit()).isTrue();
+        UndertowServerProperties undertowProperties = new UndertowServerProperties();
+        undertowProperties.setEagerFilterInit(false);
+        new UndertowServletWebServerFactoryCustomizer(undertowProperties).customize(factory);
+        assertThat(factory.isEagerFilterInit()).isFalse();
+    }
 
-	@Test
-	void preservePathOnForwardCanBeEnabled() {
-		UndertowServletWebServerFactory factory = new UndertowServletWebServerFactory(0);
-		assertThat(factory.isPreservePathOnForward()).isFalse();
-		UndertowServerProperties undertowProperties = new UndertowServerProperties();
-		undertowProperties.setPreservePathOnForward(true);
-		new UndertowServletWebServerFactoryCustomizer(undertowProperties).customize(factory);
-		assertThat(factory.isPreservePathOnForward()).isTrue();
-	}
+    @Test
+    void preservePathOnForwardCanBeEnabled() {
+        UndertowServletWebServerFactory factory = new UndertowServletWebServerFactory(0);
+        assertThat(factory.isPreservePathOnForward()).isFalse();
+        UndertowServerProperties undertowProperties = new UndertowServerProperties();
+        undertowProperties.setPreservePathOnForward(true);
+        new UndertowServletWebServerFactoryCustomizer(undertowProperties).customize(factory);
+        assertThat(factory.isPreservePathOnForward()).isTrue();
+    }
 
 }

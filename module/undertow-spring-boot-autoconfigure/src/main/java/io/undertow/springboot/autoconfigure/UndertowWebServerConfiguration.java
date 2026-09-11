@@ -32,10 +32,10 @@ import org.springframework.core.env.Environment;
 @Configuration(proxyBeanMethods = false)
 public class UndertowWebServerConfiguration {
 
-	@Bean
-	UndertowWebServerFactoryCustomizer undertowWebServerFactoryCustomizer(Environment environment,
-			ServerProperties serverProperties, UndertowServerProperties undertowProperties) {
-		return new UndertowWebServerFactoryCustomizer(environment, serverProperties, undertowProperties);
-	}
+    @Bean
+    UndertowWebServerFactoryCustomizer undertowWebServerFactoryCustomizer(Environment environment,
+            ServerProperties serverProperties, UndertowServerProperties undertowProperties) {
+        return new UndertowWebServerFactoryCustomizer(environment, serverProperties, undertowProperties);
+    }
 
 }

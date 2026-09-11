@@ -32,43 +32,43 @@ import org.jspecify.annotations.Nullable;
  */
 class CompositeResourceManager implements ResourceManager {
 
-	private final List<ResourceManager> resourceManagers;
+    private final List<ResourceManager> resourceManagers;
 
-	CompositeResourceManager(ResourceManager... resourceManagers) {
-		this.resourceManagers = Arrays.asList(resourceManagers);
-	}
+    CompositeResourceManager(ResourceManager... resourceManagers) {
+        this.resourceManagers = Arrays.asList(resourceManagers);
+    }
 
-	@Override
-	public void close() throws IOException {
-		for (ResourceManager resourceManager : this.resourceManagers) {
-			resourceManager.close();
-		}
-	}
+    @Override
+    public void close() throws IOException {
+        for (ResourceManager resourceManager : this.resourceManagers) {
+            resourceManager.close();
+        }
+    }
 
-	@Override
-	public @Nullable Resource getResource(String path) throws IOException {
-		for (ResourceManager resourceManager : this.resourceManagers) {
-			Resource resource = resourceManager.getResource(path);
-			if (resource != null) {
-				return resource;
-			}
-		}
-		return null;
-	}
+    @Override
+    public @Nullable Resource getResource(String path) throws IOException {
+        for (ResourceManager resourceManager : this.resourceManagers) {
+            Resource resource = resourceManager.getResource(path);
+            if (resource != null) {
+                return resource;
+            }
+        }
+        return null;
+    }
 
-	@Override
-	public boolean isResourceChangeListenerSupported() {
-		return false;
-	}
+    @Override
+    public boolean isResourceChangeListenerSupported() {
+        return false;
+    }
 
-	@Override
-	public void registerResourceChangeListener(ResourceChangeListener listener) {
-		throw UndertowMessages.MESSAGES.resourceChangeListenerNotSupported();
-	}
+    @Override
+    public void registerResourceChangeListener(ResourceChangeListener listener) {
+        throw UndertowMessages.MESSAGES.resourceChangeListenerNotSupported();
+    }
 
-	@Override
-	public void removeResourceChangeListener(ResourceChangeListener listener) {
-		throw UndertowMessages.MESSAGES.resourceChangeListenerNotSupported();
-	}
+    @Override
+    public void removeResourceChangeListener(ResourceChangeListener listener) {
+        throw UndertowMessages.MESSAGES.resourceChangeListenerNotSupported();
+    }
 
 }

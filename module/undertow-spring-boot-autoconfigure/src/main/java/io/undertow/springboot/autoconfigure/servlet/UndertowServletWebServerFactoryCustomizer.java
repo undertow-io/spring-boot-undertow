@@ -28,16 +28,16 @@ import org.springframework.boot.web.server.autoconfigure.ServerProperties;
  */
 class UndertowServletWebServerFactoryCustomizer implements WebServerFactoryCustomizer<UndertowServletWebServerFactory> {
 
-	private final UndertowServerProperties undertowProperties;
+    private final UndertowServerProperties undertowProperties;
 
-	UndertowServletWebServerFactoryCustomizer(UndertowServerProperties undertowProperties) {
-		this.undertowProperties = undertowProperties;
-	}
+    UndertowServletWebServerFactoryCustomizer(UndertowServerProperties undertowProperties) {
+        this.undertowProperties = undertowProperties;
+    }
 
-	@Override
-	public void customize(UndertowServletWebServerFactory factory) {
-		factory.setEagerFilterInit(this.undertowProperties.isEagerFilterInit());
-		factory.setPreservePathOnForward(this.undertowProperties.isPreservePathOnForward());
-	}
+    @Override
+    public void customize(UndertowServletWebServerFactory factory) {
+        factory.setEagerFilterInit(this.undertowProperties.isEagerFilterInit());
+        factory.setPreservePathOnForward(this.undertowProperties.isPreservePathOnForward());
+    }
 
 }

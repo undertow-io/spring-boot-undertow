@@ -58,39 +58,39 @@ import org.springframework.core.task.VirtualThreadTaskExecutor;
 @Import({ UndertowWebServerConfiguration.class, ServletWebServerConfiguration.class })
 public final class UndertowServletWebServerAutoConfiguration {
 
-	@Bean
-	@ConditionalOnMissingBean(value = ServletWebServerFactory.class, search = SearchStrategy.CURRENT)
-	UndertowServletWebServerFactory undertowServletWebServerFactory(
-			ObjectProvider<UndertowDeploymentInfoCustomizer> deploymentInfoCustomizers,
-			ObjectProvider<UndertowBuilderCustomizer> builderCustomizers) {
-		UndertowServletWebServerFactory factory = new UndertowServletWebServerFactory();
-		factory.getDeploymentInfoCustomizers().addAll(deploymentInfoCustomizers.orderedStream().toList());
-		factory.getBuilderCustomizers().addAll(builderCustomizers.orderedStream().toList());
-		return factory;
-	}
+    @Bean
+    @ConditionalOnMissingBean(value = ServletWebServerFactory.class, search = SearchStrategy.CURRENT)
+    UndertowServletWebServerFactory undertowServletWebServerFactory(
+            ObjectProvider<UndertowDeploymentInfoCustomizer> deploymentInfoCustomizers,
+            ObjectProvider<UndertowBuilderCustomizer> builderCustomizers) {
+        UndertowServletWebServerFactory factory = new UndertowServletWebServerFactory();
+        factory.getDeploymentInfoCustomizers().addAll(deploymentInfoCustomizers.orderedStream().toList());
+        factory.getBuilderCustomizers().addAll(builderCustomizers.orderedStream().toList());
+        return factory;
+    }
 
-	@Bean
-	UndertowServletWebServerFactoryCustomizer undertowServletWebServerFactoryCustomizer(
-			UndertowServerProperties undertowProperties) {
-		return new UndertowServletWebServerFactoryCustomizer(undertowProperties);
-	}
+    @Bean
+    UndertowServletWebServerFactoryCustomizer undertowServletWebServerFactoryCustomizer(
+            UndertowServerProperties undertowProperties) {
+        return new UndertowServletWebServerFactoryCustomizer(undertowProperties);
+    }
 
-	@Bean
-	@ConditionalOnThreading(Threading.VIRTUAL)
-	UndertowDeploymentInfoCustomizer virtualThreadsUndertowDeploymentInfoCustomizer() {
-		return (deploymentInfo) -> deploymentInfo.setExecutor(new VirtualThreadTaskExecutor("undertow-"));
-	}
+    @Bean
+    @ConditionalOnThreading(Threading.VIRTUAL)
+    UndertowDeploymentInfoCustomizer virtualThreadsUndertowDeploymentInfoCustomizer() {
+        return (deploymentInfo) -> deploymentInfo.setExecutor(new VirtualThreadTaskExecutor("undertow-"));
+    }
 
-	@Configuration(proxyBeanMethods = false)
-	@ConditionalOnClass(Bootstrap.class)
-	static class UndertowWebSocketConfiguration {
+    @Configuration(proxyBeanMethods = false)
+    @ConditionalOnClass(Bootstrap.class)
+    static class UndertowWebSocketConfiguration {
 
-		@Bean
-		@ConditionalOnMissingBean(name = "websocketServletWebServerCustomizer")
-		WebSocketUndertowServletWebServerFactoryCustomizer websocketServletWebServerCustomizer() {
-			return new WebSocketUndertowServletWebServerFactoryCustomizer();
-		}
+        @Bean
+        @ConditionalOnMissingBean(name = "websocketServletWebServerCustomizer")
+        WebSocketUndertowServletWebServerFactoryCustomizer websocketServletWebServerCustomizer() {
+            return new WebSocketUndertowServletWebServerFactoryCustomizer();
+        }
 
-	}
+    }
 
 }
