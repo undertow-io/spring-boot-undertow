@@ -31,6 +31,7 @@ import io.undertow.springboot.UndertowAccess;
 import io.undertow.springboot.UndertowBuilderCustomizer;
 import io.undertow.springboot.UndertowWebServer;
 import org.springframework.boot.web.server.Shutdown;
+import org.springframework.boot.web.server.WebServer;
 import org.springframework.boot.web.server.reactive.AbstractReactiveWebServerFactoryTests;
 import org.springframework.boot.web.server.reactive.ConfigurableReactiveWebServerFactory;
 import org.springframework.http.MediaType;
@@ -41,6 +42,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.inOrder;
@@ -58,6 +60,14 @@ class UndertowReactiveWebServerFactoryTests extends AbstractReactiveWebServerFac
     @Override
     protected UndertowReactiveWebServerFactory getFactory() {
         return new UndertowReactiveWebServerFactory(0);
+    }
+
+    @Test
+    void multipleCallsToDestroyAreTolerated() {
+        WebServer webServer = getFactory().getWebServer(mock(HttpHandler.class));
+        webServer.start();
+        webServer.destroy();
+        assertThatNoException().isThrownBy(webServer::destroy);
     }
 
     @Test
