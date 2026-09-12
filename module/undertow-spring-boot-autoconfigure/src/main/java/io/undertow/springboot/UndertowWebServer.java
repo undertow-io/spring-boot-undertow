@@ -298,15 +298,26 @@ public class UndertowWebServer implements WebServer {
             try {
                 if (this.undertow != null) {
                     this.undertow.stop();
-                    Assert.state(this.closeables != null, "'closeables' must not be null");
-                    for (Closeable closeable : this.closeables) {
-                        closeable.close();
-                    }
-                    this.undertow = null;
                 }
             }
             catch (Exception ex) {
                 throw new WebServerException("Unable to stop Undertow", ex);
+            }
+        }
+    }
+
+    @Override
+    public void destroy() {
+        stop();
+        List<Closeable> closeables = this.closeables;
+        if (closeables != null) {
+            try {
+                for (Closeable closeable : closeables) {
+                    closeable.close();
+                }
+            }
+            catch (IOException ex) {
+                throw new WebServerException("Unable to destroy Undertow", ex);
             }
         }
     }
