@@ -1,12 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd"
+<project child.project.url.inherit.append.path="false" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd"
     xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
 
+  <parent>
+    <groupId>org.jboss</groupId>
+    <artifactId>jboss-parent</artifactId>
+    <version>50</version>
+    <relativePath/>
+  </parent>
+
   <groupId>io.undertow</groupId>
   <artifactId>undertow-spring-boot-parent</artifactId>
-  <version>1.0.0.Final-SNAPSHOT</version>
+  <version>1.0.0.Alpha1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>undertow-spring-boot-parent</name>
@@ -21,6 +28,15 @@
     </license>
   </licenses>
 
+  <scm child.scm.connection.inherit.append.path="false"
+       child.scm.developerConnection.inherit.append.path="false"
+       child.scm.url.inherit.append.path="false">
+    <connection>scm:git:https://github.com/undertow-io/spring-boot-undertow.git</connection>
+    <developerConnection>scm:git:git@github.com:undertow-io/spring-boot-undertow.git</developerConnection>
+    <url>https://github.com/undertow-io/spring-boot-undertow</url>
+    <tag>HEAD</tag>
+  </scm>
+
   <modules>
     <module>module/undertow-spring-boot-autoconfigure</module>
     <module>starter/undertow-spring-boot-starter</module>
@@ -31,14 +47,19 @@
     <maven.compiler.release>17</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-    <version.org.springframework.boot>4.1.0</version.org.springframework.boot>
-    <version.io.undertow.ee>2.0.1.Final</version.io.undertow.ee>
+    <version.org.springframework.boot>4.1.1</version.org.springframework.boot>
+    <version.io.undertow.ee>2.0.2.Final</version.io.undertow.ee>
 
     <!-- Checkstyle and SpotBugs -->
     <version.io.undertow.build.checkstyle-config>2.0.0.Final</version.io.undertow.build.checkstyle-config>
     <version.com.github.spotbugs-maven-plugin>4.9.8.3</version.com.github.spotbugs-maven-plugin>
     <spotbugs.exclude.filter.file>${maven.multiModuleProjectDirectory}/spotbugs-exclude.xml</spotbugs.exclude.filter.file>
     <linkXRef>false</linkXRef>
+
+    <!-- Release: staged on the JBoss Nexus, then synced to Maven Central -->
+    <nexus.repository.staging>jboss-io</nexus.repository.staging>
+    <nexus.repository.release>releases</nexus.repository.release>
+    <nexus.staging.tag>undertow-spring-boot-${project.version}</nexus.staging.tag>
   </properties>
 
   <dependencyManagement>
@@ -81,7 +102,6 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.13.0</version>
           <configuration>
             <release>${maven.compiler.release}</release>
             <encoding>${project.build.sourceEncoding}</encoding>
@@ -90,12 +110,10 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>3.2.5</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-checkstyle-plugin</artifactId>
-          <version>3.6.0</version>
           <configuration>
             <configLocation>undertow-checkstyle/checkstyle.xml</configLocation>
             <consoleOutput>true</consoleOutput>

@@ -4,7 +4,7 @@
   <parent>
     <groupId>io.undertow</groupId>
     <artifactId>undertow-spring-boot-parent</artifactId>
-    <version>1.0.0.Final-SNAPSHOT</version>
+    <version>1.0.0.Alpha1-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <modelVersion>4.0.0</modelVersion>
@@ -63,4 +63,43 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifestEntries>
+              <!-- Excluded from repackaged applications by spring-boot-maven-plugin -->
+              <Spring-Boot-Jar-Type>dependencies-starter</Spring-Boot-Jar-Type>
+            </manifestEntries>
+          </archive>
+        </configuration>
+        <executions>
+          <!-- Maven Central requires sources and javadoc jars; this module has no code -->
+          <execution>
+            <id>placeholder-sources-jar</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+            <configuration>
+              <classifier>sources</classifier>
+              <classesDirectory>${project.basedir}/src/placeholder</classesDirectory>
+            </configuration>
+          </execution>
+          <execution>
+            <id>placeholder-javadoc-jar</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+            <configuration>
+              <classifier>javadoc</classifier>
+              <classesDirectory>${project.basedir}/src/placeholder</classesDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>
