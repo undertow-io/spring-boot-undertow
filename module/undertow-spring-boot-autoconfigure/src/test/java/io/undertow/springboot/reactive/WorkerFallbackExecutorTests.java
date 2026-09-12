@@ -47,6 +47,28 @@ class WorkerFallbackExecutorTests {
     }
 
     @Test
+    void replacesWorkerThatHasBeenShutDown() {
+        XnioWorker stopped = mock(XnioWorker.class);
+        given(stopped.isShutdown()).willReturn(true);
+        this.executor.setWorker(stopped);
+        XnioWorker restarted = mock(XnioWorker.class);
+        this.executor.setWorker(restarted);
+        Runnable task = () -> { };
+        this.executor.execute(task);
+        then(restarted).should().execute(task);
+    }
+
+    @Test
+    void keepsWorkerThatIsRunning() {
+        XnioWorker running = mock(XnioWorker.class);
+        this.executor.setWorker(running);
+        this.executor.setWorker(mock(XnioWorker.class));
+        Runnable task = () -> { };
+        this.executor.execute(task);
+        then(running).should().execute(task);
+    }
+
+    @Test
     void runsInlineWhenWorkerIsShutDown() {
         XnioWorker worker = mock(XnioWorker.class);
         given(worker.isShutdown()).willReturn(true);
