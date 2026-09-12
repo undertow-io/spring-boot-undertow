@@ -213,6 +213,13 @@
          cd spring-boot && ./gradlew publishToMavenLocal -->
     <profile>
       <id>tck</id>
+      <properties>
+        <!-- Skip the inherited TCK startedLogMessageWith* tests: they expect a
+             (Jetty|Netty|Tomcat) started log message and are package-private, so they
+             cannot be overridden. The undertowStartedLogMessage* tests cover the Undertow
+             message. Passing -Dtest on the command line replaces this filter. -->
+        <test>!Undertow*WebServerFactoryTests#startedLogMessageWith*</test>
+      </properties>
       <dependencies>
         <dependency>
           <groupId>org.springframework.boot</groupId>

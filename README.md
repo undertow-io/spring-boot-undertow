@@ -107,8 +107,7 @@ cd /path/to/spring-boot-undertow
 mvn test -pl module/undertow-spring-boot-autoconfigure -Ptck
 ```
 
-- **5 log-message pattern tests** (inherited from TCK): The abstract base class uses a `(Jetty|Tomcat)` regex that cannot be modified. Equivalent Undertow-specific log-message tests are provided as `undertowStartedLogMessage*`.
-- **3 reactive stop/graceful-shutdown tests** (inherited from TCK): `Undertow.stop()` tears down the XNIO worker immediately. The old native `UndertowHttpHandlerAdapter` (removed from Spring Framework 7.0) kept worker threads busy for the request duration; the Servlet bridge dispatches to the servlet engine's async executor instead. Servlet-based graceful shutdown works correctly.
+The inherited TCK `startedLogMessageWith*` tests are skipped by the `tck` profile, through surefire's `test` property: the abstract base classes expect a `(Jetty|Netty|Tomcat)` started log message, and the tests are package-private, so they cannot be overridden. Equivalent Undertow-specific tests are provided as `undertowStartedLogMessage*`. Passing `-Dtest=...` replaces this filter, so the inherited tests run (and fail) when you select one of the web server factory test classes explicitly.
 
 ## Requirements
 
