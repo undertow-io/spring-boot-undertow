@@ -131,12 +131,14 @@ public class UndertowReactiveWebServerFactory extends UndertowWebServerFactory
 
         @Override
         public void close() throws IOException {
-            try {
-                this.manager.stop();
-                this.manager.undeploy();
-            }
-            catch (ServletException ex) {
-                throw new RuntimeException(ex);
+            if (this.manager.getState() != DeploymentManager.State.UNDEPLOYED) {
+                try {
+                    this.manager.stop();
+                    this.manager.undeploy();
+                }
+                catch (ServletException ex) {
+                    throw new RuntimeException(ex);
+                }
             }
         }
 

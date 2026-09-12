@@ -53,6 +53,7 @@ import org.springframework.boot.web.error.ErrorPage;
 import org.springframework.boot.web.server.GracefulShutdownResult;
 import org.springframework.boot.web.server.PortInUseException;
 import org.springframework.boot.web.server.Shutdown;
+import org.springframework.boot.web.server.WebServer;
 import org.springframework.boot.web.server.servlet.AbstractServletWebServerFactoryTests;
 import org.springframework.boot.web.server.servlet.ConfigurableServletWebServerFactory;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
@@ -63,6 +64,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIOException;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.inOrder;
@@ -250,6 +252,16 @@ class UndertowServletWebServerFactoryTests extends AbstractServletWebServerFacto
     @Disabled("https://issues.redhat.com/browse/UNDERTOW-2420")
     protected void portClashOfSecondaryConnectorResultsInPortInUseException() throws Exception {
         super.portClashOfSecondaryConnectorResultsInPortInUseException();
+    }
+
+    @Test
+    void multipleCallsToDestroyAreTolerated() {
+        ConfigurableServletWebServerFactory factory = getFactory();
+        factory.setPort(0);
+        WebServer webServer = factory.getWebServer();
+        webServer.start();
+        webServer.destroy();
+        assertThatNoException().isThrownBy(webServer::destroy);
     }
 
     private void testAccessLog(String prefix, String suffix, String expectedFile)

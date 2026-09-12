@@ -76,12 +76,14 @@ public class DeploymentManagerHttpHandlerFactory implements HttpHandlerFactory {
 
         @Override
         public void close() throws IOException {
-            try {
-                this.deploymentManager.stop();
-                this.deploymentManager.undeploy();
-            }
-            catch (ServletException ex) {
-                throw new RuntimeException(ex);
+            if (this.deploymentManager.getState() != DeploymentManager.State.UNDEPLOYED) {
+                try {
+                    this.deploymentManager.stop();
+                    this.deploymentManager.undeploy();
+                }
+                catch (ServletException ex) {
+                    throw new RuntimeException(ex);
+                }
             }
         }
 
