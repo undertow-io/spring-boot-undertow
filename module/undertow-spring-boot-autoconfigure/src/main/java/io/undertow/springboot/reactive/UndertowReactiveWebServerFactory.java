@@ -159,7 +159,10 @@ public class UndertowReactiveWebServerFactory extends UndertowWebServerFactory
         private volatile @Nullable XnioWorker worker;
 
         void setWorker(XnioWorker worker) {
-            if (this.worker == null) {
+            // Undertow creates a new worker each time the server is started, so replace a
+            // worker that has been shut down
+            XnioWorker current = this.worker;
+            if (current != worker && (current == null || current.isShutdown())) {
                 this.worker = worker;
             }
         }
